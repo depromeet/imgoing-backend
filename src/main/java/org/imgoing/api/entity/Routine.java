@@ -1,7 +1,6 @@
-package org.imgoing.api.domain.routine;
+package org.imgoing.api.entity;
 
 import lombok.*;
-import org.imgoing.api.domain.BaseTimeEntity;
 
 import javax.persistence.*;
 
@@ -11,7 +10,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Routine extends BaseTimeEntity{
+public class Routine extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id", nullable = false)

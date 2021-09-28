@@ -1,4 +1,4 @@
-package org.imgoing.api.domain;
+package org.imgoing.api.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class BaseTimeEntity {
+public abstract class BaseTime {
     @CreatedDate
     @Column(name ="created_at")
     protected LocalDateTime createdAt;

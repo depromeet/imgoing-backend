@@ -1,11 +1,8 @@
-package org.imgoing.api.domain.routine_task;
+package org.imgoing.api.entity;
 
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.imgoing.api.domain.BaseTimeEntity;
-import org.imgoing.api.domain.routine.Routine;
-import org.imgoing.api.domain.task.Task;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="routine_task_tb")
-public class RoutineTask extends BaseTimeEntity {
+public class RoutineTask extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id", nullable = false)
