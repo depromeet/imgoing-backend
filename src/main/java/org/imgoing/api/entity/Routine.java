@@ -3,6 +3,7 @@ package org.imgoing.api.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter @Setter
 @Entity
@@ -18,4 +19,8 @@ public class Routine extends BaseTime {
 
     @Column(nullable = false, length = 50)
     private String name;
+
+    public void modifyRoutine(Routine newRoutine) {
+        this.name = newRoutine.getName();
+    }
 }
