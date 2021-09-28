@@ -1,9 +1,6 @@
-package org.imgoing.api.domain.task;
+package org.imgoing.api.entity;
 
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.imgoing.api.domain.BaseTimeEntity;
 
 import javax.persistence.*;
 
@@ -13,7 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="task_tb")
-public class Task extends BaseTimeEntity {
+public class Task extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
