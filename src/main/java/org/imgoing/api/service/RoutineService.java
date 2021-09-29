@@ -6,6 +6,8 @@ import org.imgoing.api.repository.RoutineRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RoutineService {
@@ -15,6 +17,10 @@ public class RoutineService {
     public Routine getById(Long id){
         return routineRepository.findById(id)
                 .orElseThrow(() -> new NullPointerException("존재하지 않는 루틴입니다."));
+    }
+    @Transactional(readOnly = true)
+    public List<Routine> getListByUserId(Long userId){
+        return routineRepository.findAll();
     }
     @Transactional
     public Routine create(Routine newRoutine){
