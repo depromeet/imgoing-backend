@@ -54,9 +54,7 @@ public class RoutineController {
 
     @ApiOperation(value = "루틴 정보 수정")
     @PutMapping("/{routineId}")
-    public ResponseEntity<Object> update(@RequestBody RoutineDto dto,
-                                         @ApiParam(value = "루틴 id", required = true, example = "1")
-                                                @PathVariable(value = "routineId") Long id){
+    public ResponseEntity<Object> update(@RequestBody RoutineDto dto){
         Routine newRoutine =  routineMapper.toEntity(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED)

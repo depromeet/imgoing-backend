@@ -21,4 +21,9 @@ public class Task extends BaseTime {
 
     @Column(nullable = false)
     private Integer time;
+
+    public void modifyTask(Task newTask) {
+        this.name = newTask.getName();
+        this.time = newTask.getTime();
+    }
 }
