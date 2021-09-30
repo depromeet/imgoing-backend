@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @RestController
 @Api(value = "TaskController")
@@ -34,6 +36,18 @@ public class TaskController {
     public ResponseEntity<Object> get(@ApiParam(value = "일정 id", required = true, example = "1")
                                           @PathVariable(value = "taskId") Long id){
         return ResponseEntity.status(HttpStatus.OK).body(taskService.getById(id));
+    }
+
+    @ApiOperation(value = "일정 리스트 조회")
+    @GetMapping("/{userId}")
+    public ResponseEntity<Object> getList(@ApiParam(value = "회원 id", required = true, example = "1")
+                                          @PathVariable(value = "userId") Long userId){
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                taskService.getListByUserId(userId).stream()
+                        .map(taskMapper::toDto)
+                        .collect(Collectors.toList())
+        );
     }
 
     @ApiOperation(value = "일정 삭제")
