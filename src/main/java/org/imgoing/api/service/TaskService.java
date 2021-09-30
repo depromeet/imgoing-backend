@@ -6,6 +6,8 @@ import org.imgoing.api.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -20,6 +22,11 @@ public class TaskService {
     public Task getById(Long id){
         return taskRepository.findById(id)
                 .orElseThrow(() -> new NullPointerException("존재하지 않는 일정입니다."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Task> getListByUserId(Long userId){
+        return taskRepository.findAllByUserId(userId);
     }
 
     @Transactional

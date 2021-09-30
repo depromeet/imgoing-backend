@@ -1,4 +1,4 @@
-package org.imgoing.api.entity;
+package org.imgoing.api.config;
 
 import lombok.Getter;
 import lombok.Setter;

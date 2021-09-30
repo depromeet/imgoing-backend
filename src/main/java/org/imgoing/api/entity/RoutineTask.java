@@ -3,6 +3,7 @@ package org.imgoing.api.entity;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,10 +18,9 @@ import java.util.List;
 @Table(name="routine_task_tb")
 public class RoutineTask extends BaseTime {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable = false)
     private Long id;
 
+    @MapsId
     @OneToOne
     @JoinColumn(name = "routine_id")
     @OnDelete(action = OnDeleteAction.CASCADE)

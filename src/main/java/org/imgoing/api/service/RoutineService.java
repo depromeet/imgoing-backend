@@ -13,6 +13,11 @@ import java.util.List;
 public class RoutineService {
     private final RoutineRepository routineRepository;
 
+    @Transactional
+    public Routine create(Routine newRoutine){
+        return routineRepository.save(newRoutine);
+    }
+
     @Transactional(readOnly = true)
     public Routine getById(Long id){
         return routineRepository.findById(id)
@@ -21,12 +26,7 @@ public class RoutineService {
 
     @Transactional(readOnly = true)
     public List<Routine> getListByUserId(Long userId){
-        return routineRepository.findAll();
-    }
-
-    @Transactional
-    public Routine create(Routine newRoutine){
-        return routineRepository.save(newRoutine);
+        return routineRepository.findAllByUserId(userId);
     }
 
     @Transactional

@@ -8,6 +8,7 @@ import org.imgoing.api.dto.RoutineDto;
 import org.imgoing.api.entity.Routine;
 import org.imgoing.api.mapper.RoutineMapper;
 import org.imgoing.api.service.RoutineService;
+import org.imgoing.api.service.RoutineTaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,18 +21,25 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/routines")
 public class RoutineController {
     private final RoutineService routineService;
+    private final RoutineTaskService routineTaskService;
     private final RoutineMapper routineMapper;
 
     @ApiOperation(value = "루틴 생성")
     @PostMapping("")
     public ResponseEntity<Object> create(@RequestBody RoutineDto dto) {
         Routine newRoutine =  routineMapper.toEntity(dto);
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(routineService.create(newRoutine));
     }
 
-    @ApiOperation(value = "투린 조회")
+    @ApiOperation(value = "루틴 조회")
+    @GetMapping("/{routineId}")
+    public ResponseEntity<Object> get(@ApiParam(value = "루틴 id", required = true, example = "1")
+                                      @PathVariable(value = "routineId") Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(routineService.getById(id));
+    }
+
+    @ApiOperation(value = "루틴 리스트 조회")
     @GetMapping("/{userId}")
     public ResponseEntity<Object> getList(@ApiParam(value = "회원 id", required = true, example = "1")
                                           @PathVariable(value = "userId") Long userId){
