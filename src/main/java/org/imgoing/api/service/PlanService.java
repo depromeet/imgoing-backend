@@ -1,0 +1,37 @@
+package org.imgoing.api.service;
+
+import lombok.RequiredArgsConstructor;
+import org.imgoing.api.entity.Plan;
+import org.imgoing.api.repository.PlanRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class PlanService {
+    private final PlanRepository planRepository;
+
+    @Transactional(readOnly = true)
+    public Plan getPlanById(Long id) {
+        return planRepository.findById(id)
+                .orElseThrow(() -> new NullPointerException("존재하지 않는 일정입니다."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Plan> getPlanByUserId(Long userId) {
+        // 일단 findAll
+        return planRepository.findAll();
+    }
+
+    @Transactional
+    public Plan create(Plan newPlan) {
+        return planRepository.save(newPlan);
+    }
+
+    @Transactional
+    public void delete(Plan plan) {
+        planRepository.delete(plan);
+    }
+}
