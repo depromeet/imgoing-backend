@@ -18,10 +18,12 @@ public class RoutineService {
         return routineRepository.findById(id)
                 .orElseThrow(() -> new NullPointerException("존재하지 않는 루틴입니다."));
     }
+
     @Transactional(readOnly = true)
     public List<Routine> getListByUserId(Long userId){
         return routineRepository.findAll();
     }
+
     @Transactional
     public Routine create(Routine newRoutine){
         return routineRepository.save(newRoutine);
