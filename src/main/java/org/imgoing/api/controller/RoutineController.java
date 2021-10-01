@@ -2,64 +2,58 @@ package org.imgoing.api.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.dto.RoutineDto;
 import org.imgoing.api.entity.Routine;
+import org.imgoing.api.entity.Subtask;
+import org.imgoing.api.entity.Task;
 import org.imgoing.api.mapper.RoutineMapper;
+import org.imgoing.api.mapper.SubtaskMapper;
+import org.imgoing.api.service.TaskService;
 import org.imgoing.api.service.RoutineService;
+import org.imgoing.api.service.SubtaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
 @Api(value = "RoutineController")
 @RequestMapping("/api/v1/routines")
 public class RoutineController {
     private final RoutineService routineService;
+    private final TaskService taskService;
+    private final SubtaskService subtaskService;
     private final RoutineMapper routineMapper;
 
     @ApiOperation(value = "루틴 생성")
-    @PostMapping("")
-    public ResponseEntity<Object> create(@RequestBody RoutineDto dto) {
-        Routine newRoutine =  routineMapper.toEntity(dto);
+    @PostMapping
+    public ResponseEntity<Object> create(@RequestBody RoutineDto.Create dto) {
+        Task task = Task.builder().id(dto.getTaskId()).build();
+
+        List<Subtask> subtaskList = dto.getSubtaskIdList()
+                .stream()
+                .map(subtaskId -> Subtask.builder().id(subtaskId).build())
+                .collect(Collectors.toList());
+
+//        Task task = taskService.getById(dto.getTaskId());
+//
+//        List<Subtask> subtaskList = dto.getSubtaskIdList()
+//                .stream()
+//                .map(subtaskService::getById)
+//                .collect(Collectors.toList());
+
+        Routine newRoutine = routineMapper.toEntityForPost(task, subtaskList);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(routineService.create(newRoutine));
-    }
-
-    @ApiOperation(value = "투린 조회")
-    @GetMapping("/{userId}")
-    public ResponseEntity<Object> getList(@ApiParam(value = "회원 id", required = true, example = "1")
-                                          @PathVariable(value = "userId") Long userId){
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-                routineService.getListByUserId(userId).stream()
-                .map(routineMapper::toDto)
-                .collect(Collectors.toList())
-        );
-    }
-
-    @ApiOperation(value = "루틴 삭제")
-    @DeleteMapping("/{routineId}")
-    public ResponseEntity<Object> delete(@ApiParam(value = "루틴 id", required = true, example = "1")
-                                                @PathVariable(value = "routineId") Long id){
-        routineService.delete(routineService.getById(id));
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body("id = " + id + " 루틴이 삭제되었습니다.");
-    }
-
-    @ApiOperation(value = "루틴 정보 수정")
-    @PutMapping("/{routineId}")
-    public ResponseEntity<Object> update(@RequestBody RoutineDto dto,
-                                         @ApiParam(value = "루틴 id", required = true, example = "1")
-                                                @PathVariable(value = "routineId") Long id){
-        Routine newRoutine =  routineMapper.toEntity(dto);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(routineMapper.toDto(routineService.update(newRoutine)));
+                .body(routineMapper.toDto(routineService.create(newRoutine)));
     }
 }
