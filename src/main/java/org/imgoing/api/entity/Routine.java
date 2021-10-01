@@ -1,36 +1,37 @@
 package org.imgoing.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
-@Table(name="routine_tb")
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Routine extends BaseTime {
+@Table(name = "routine_tb")
+public class Routine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id", nullable = false)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String name;
-
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private User user;
+    private Task task;
 
-    public void modifyRoutine(Routine newRoutine) {
-        this.name = newRoutine.getName();
-    }
+    @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "subtask_id", referencedColumnName = "id")
+    private List<Subtask> subtaskList = new ArrayList<>();
 }

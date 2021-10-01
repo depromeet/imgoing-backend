@@ -21,12 +21,17 @@ public class TaskService {
     @Transactional(readOnly = true)
     public Task getById(Long id){
         return taskRepository.findById(id)
-                .orElseThrow(() -> new NullPointerException("존재하지 않는 일정입니다."));
+                .orElseThrow(() -> new NullPointerException("존재하지 않는 업무입니다."));
     }
 
     @Transactional(readOnly = true)
     public List<Task> getListByUserId(Long userId){
         return taskRepository.findAllByUserId(userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Task> getListAll(){
+        return taskRepository.findAll();
     }
 
     @Transactional
@@ -39,7 +44,7 @@ public class TaskService {
         Long id = newTask.getId();
         Task oldTask = getById(id);
 
-        oldTask.modifyTask(newTask);
+        oldTask.modifyRoutine(newTask);
         return taskRepository.save(oldTask);
     }
 }

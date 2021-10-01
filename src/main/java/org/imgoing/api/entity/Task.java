@@ -1,9 +1,7 @@
 package org.imgoing.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
@@ -11,30 +9,26 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
+@Table(name = "task_tb")
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name="task_tb")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Task extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(nullable = false)
-    private Integer time;
 
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "user_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private User user;
+    @JsonManagedReference
+    @OneToOne(mappedBy = "task", fetch = FetchType.LAZY)
+    @JoinColumn(name = "routine_id", referencedColumnName = "id")
+    private Routine routine;
 
-    public void modifyTask(Task newTask) {
+    public void modifyRoutine(Task newTask) {
         this.name = newTask.getName();
-        this.time = newTask.getTime();
     }
 }
