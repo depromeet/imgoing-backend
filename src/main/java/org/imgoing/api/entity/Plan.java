@@ -1,6 +1,7 @@
 package org.imgoing.api.entity;
 
 import lombok.*;
+import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="plan_tb")
-public class Plan extends BaseTime{
+public class Plan extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
