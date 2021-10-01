@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@Api(value = "루틴 관련 API")
+@Api(tags = "루틴 관련 API")
 @RequestMapping("/api/v1/routines")
 public class RoutineController {
     private final RoutineService routineService;
