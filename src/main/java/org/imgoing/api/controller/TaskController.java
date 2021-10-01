@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@Api(value = "TaskController")
+@Api(value = "업무 관련 API")
 @RequestMapping("/api/v1/tasks")
 public class TaskController {
     private final TaskService taskService;

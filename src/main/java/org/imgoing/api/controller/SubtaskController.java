@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@Api(value = "SubtaskController")
+@Api(value = "세부 업무 관련 API")
 @RequestMapping("/api/v1/subtasks")
 public class SubtaskController {
     private final SubtaskService subtaskService;

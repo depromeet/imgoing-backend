@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@Api(value = "PlanController")
+@Api(value = "약속 관련 API")
 @RequestMapping("/api/v1/plan")
 public class PlanController {
     private final PlanService planService;
