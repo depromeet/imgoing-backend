@@ -9,10 +9,12 @@ import org.imgoing.api.entity.Task;
 import org.imgoing.api.mapper.TaskMapper;
 import org.imgoing.api.service.TaskService;
 import org.imgoing.api.service.RoutineService;
+import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -26,17 +28,20 @@ public class TaskController {
 
     @ApiOperation(value = "업무 생성")
     @PostMapping("")
-    public ResponseEntity<Object> create(@RequestBody TaskDto dto) {
+    public ImgoingResponse<Task> create(@RequestBody TaskDto dto) {
         Task newTask = taskMapper.toEntity(dto);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(taskService.create(newTask));
+        Task savedTask = taskService.create(newTask);
+        return new ImgoingResponse<>(savedTask, HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "업무 조회")
     @GetMapping("/{taskId}")
-    public ResponseEntity<Object> get(@ApiParam(value = "업무 id", required = true, example = "1")
-                                      @PathVariable(value = "taskId") Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(taskService.getById(id));
+    public ImgoingResponse<Task> get(
+            @ApiParam(value = "업무 id", required = true, example = "1")
+            @PathVariable(value = "taskId") Long id
+    ) {
+        Task foundTask = taskService.getById(id);
+        return new ImgoingResponse<>(foundTask);
     }
 
 //    @ApiOperation(value = "업무 리스트 유저별 조회")
@@ -52,29 +57,29 @@ public class TaskController {
 
     @ApiOperation(value = "업무 리스트 전체 조회")
     @GetMapping("/all")
-    public ResponseEntity<Object> getListAll(){
-        return ResponseEntity.status(HttpStatus.OK).body(
-                taskService.getListAll().stream()
-                        .map(taskMapper::toDto)
-                        .collect(Collectors.toList())
-        );
+    public ImgoingResponse<List<TaskDto>> getListAll(){
+        List<TaskDto> taskDtoList = taskService.getListAll().stream()
+                .map(taskMapper::toDto)
+                .collect(Collectors.toList());
+        return new ImgoingResponse<>(taskDtoList);
     }
 
     @ApiOperation(value = "업무 삭제")
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<Object> delete(@ApiParam(value = "업무 id", required = true, example = "1")
-                                                @PathVariable(value = "taskId") Long id){
+    public ImgoingResponse<String> delete(
+            @ApiParam(value = "업무 id", required = true, example = "1")
+            @PathVariable(value = "taskId") Long id
+    ) {
         taskService.delete(taskService.getById(id));
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body("id = " + id + " 업무이 삭제되었습니다.");
+        String responseMessage = "id = " + id + " 업무이 삭제되었습니다.";
+        return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
 
     @ApiOperation(value = "업무 정보 수정")
-    @PutMapping("/{taskId}")
-    public ResponseEntity<Object> update(@RequestBody TaskDto dto){
-        Task newTask =  taskMapper.toEntity(dto);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(taskMapper.toDto(taskService.update(newTask)));
+    @PutMapping("")
+    public ImgoingResponse<TaskDto> update(@RequestBody TaskDto dto){
+        Task newTask = taskMapper.toEntity(dto);
+        TaskDto updatedTaskDto = taskMapper.toDto(taskService.update(newTask));
+        return new ImgoingResponse<>(updatedTaskDto, HttpStatus.CREATED);
     }
 }

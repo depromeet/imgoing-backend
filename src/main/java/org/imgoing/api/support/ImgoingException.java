@@ -1,5 +1,8 @@
 package org.imgoing.api.support;
 
+import lombok.Getter;
+
+@Getter
 public class ImgoingException extends RuntimeException {
     private final ImgoingError error;
 

@@ -8,10 +8,11 @@ import org.imgoing.api.dto.PlanDto;
 import org.imgoing.api.entity.Plan;
 import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.service.PlanService;
+import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -24,30 +25,32 @@ public class PlanController {
 
     @ApiOperation(value = "일정 생성")
     @PostMapping("")
-    public ResponseEntity<Object> create(@RequestBody PlanDto planDto) {
+    public ImgoingResponse<Plan> create(@RequestBody PlanDto planDto) {
         Plan newPlan = planMapper.toEntity(planDto);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(planService.create(newPlan));
+        Plan savedPlan = planService.create(newPlan);
+        return new ImgoingResponse<>(savedPlan, HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "일정 조회")
     @GetMapping("/{userId}")
-    public ResponseEntity<Object> getList(@ApiParam(value = "회원 id", required = true, example = "1")
-                                          @PathVariable(value = "userId") Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                planService.getPlanByUserId(userId).stream()
+    public ImgoingResponse<List<PlanDto>> getList(
+            @ApiParam(value = "회원 id", required = true, example = "1")
+            @PathVariable(value = "userId") Long userId
+    ) {
+        List<PlanDto> planDtoList = planService.getPlanByUserId(userId).stream()
                 .map(planMapper::toDto)
-                .collect(Collectors.toList())
-        );
+                .collect(Collectors.toList());
+        return new ImgoingResponse<>(planDtoList);
     }
 
     @ApiOperation(value = "일정 삭제")
     @DeleteMapping("/{planId}")
-    public ResponseEntity<Object> delete(@ApiParam(value = "루틴 id", required = true, example = "1")
-                                         @PathVariable(value = "planId") Long id) {
+    public ImgoingResponse<String> delete(
+            @ApiParam(value = "루틴 id", required = true, example = "1")
+            @PathVariable(value = "planId") Long id
+    ) {
         planService.delete(planService.getPlanById(id));
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body("id = " + id + "일정이 삭제되었습니다.");
+        String responseMessage = "id = " + id + "일정이 삭제되었습니다.";
+        return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
 }
