@@ -3,6 +3,8 @@ package org.imgoing.api.service;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.entity.Subtask;
 import org.imgoing.api.repository.SubtaskRepository;
+import org.imgoing.api.support.ImgoingError;
+import org.imgoing.api.support.ImgoingException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +23,7 @@ public class SubtaskService {
     @Transactional(readOnly = true)
     public Subtask getById(Long id){
         return subtaskRepository.findById(id)
-                .orElseThrow(() -> new NullPointerException("존재하지 않는 세부업무입니다."));
+                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 세부업무입니다."));
     }
 
     @Transactional(readOnly = true)

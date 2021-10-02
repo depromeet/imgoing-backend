@@ -3,6 +3,8 @@ package org.imgoing.api.service;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.entity.Plan;
 import org.imgoing.api.repository.PlanRepository;
+import org.imgoing.api.support.ImgoingError;
+import org.imgoing.api.support.ImgoingException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +18,7 @@ public class PlanService {
     @Transactional(readOnly = true)
     public Plan getPlanById(Long id) {
         return planRepository.findById(id)
-                .orElseThrow(() -> new NullPointerException("존재하지 않는 일정입니다."));
+                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 일정입니다."));
     }
 
     @Transactional(readOnly = true)
