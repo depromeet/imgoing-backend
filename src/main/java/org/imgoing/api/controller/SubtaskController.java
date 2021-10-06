@@ -17,43 +17,43 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@Api(tags = "세부 업무 관련 API")
+@Api(tags = "준비항목 관련 API")
 @RequestMapping("/api/v1/subtasks")
 public class SubtaskController {
     private final SubtaskService subtaskService;
     private final SubtaskMapper subtaskMapper;
 
-    @ApiOperation(value = "세부업무 생성")
-    @PostMapping("")
-    public ImgoingResponse<Subtask> create(@RequestBody SubtaskDto dto) {
+    @ApiOperation(value = "준비항목 생성")
+    @PostMapping
+    public ImgoingResponse<SubtaskDto> create(@RequestBody SubtaskDto dto) {
         Subtask newSubtask = subtaskMapper.toEntity(dto);
         Subtask savedSubtask = subtaskService.create(newSubtask);
-        return new ImgoingResponse<>(savedSubtask, HttpStatus.CREATED);
+        return new ImgoingResponse<>(subtaskMapper.toDto(savedSubtask), HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "세부업무 조회")
+    @ApiOperation(value = "준비항목 조회")
     @GetMapping("/{subtaskId}")
-    public ImgoingResponse<Subtask> get(
-            @ApiParam(value = "세부업무 id", required = true, example = "1")
+    public ImgoingResponse<SubtaskDto> get(
+            @ApiParam(value = "준비항목 id", required = true, example = "1")
             @PathVariable(value = "subtaskId") Long id
     ) {
         Subtask foundSubtask = subtaskService.getById(id);
-        return new ImgoingResponse<>(foundSubtask);
+        return new ImgoingResponse<>(subtaskMapper.toDto(foundSubtask));
     }
 
-    @ApiOperation(value = "세부업무 리스트 조회")
-    @GetMapping("/{userId}")
-    public ImgoingResponse<List<SubtaskDto>> getList(
-            @ApiParam(value = "회원 id", required = true, example = "1")
-            @PathVariable(value = "userId") Long userId
-    ) {
-        List<SubtaskDto> subtaskDtoList = subtaskService.getListByUserId(userId).stream()
-                .map(subtaskMapper::toDto)
-                .collect(Collectors.toList());
-        return new ImgoingResponse<>(subtaskDtoList);
-    }
+//    @ApiOperation(value = "준비항목 리스트 조회")
+//    @GetMapping("/{userId}")
+//    public ImgoingResponse<List<SubtaskDto>> getList(
+//            @ApiParam(value = "회원 id", required = true, example = "1")
+//            @PathVariable(value = "userId") Long userId
+//    ) {
+//        List<SubtaskDto> subtaskDtoList = subtaskService.getListByUserId(userId).stream()
+//                .map(subtaskMapper::toDto)
+//                .collect(Collectors.toList());
+//        return new ImgoingResponse<>(subtaskDtoList);
+//    }
 
-    @ApiOperation(value = "세부업무 리스트 전체 조회")
+    @ApiOperation(value = "준비항목 리스트 전체 조회")
     @GetMapping("/all")
     public ImgoingResponse<List<SubtaskDto>> getListAll(){
         List<SubtaskDto> subtaskDtoList = subtaskService.getListAll().stream()
@@ -62,19 +62,21 @@ public class SubtaskController {
         return new ImgoingResponse<>(subtaskDtoList);
     }
 
-    @ApiOperation(value = "세부업무 삭제")
+    @ApiOperation(value = "준비항목 삭제")
     @DeleteMapping("/{subtaskId}")
     public ImgoingResponse<String> delete(
-            @ApiParam(value = "세부업무 id", required = true, example = "1")
+            @ApiParam(value = "준비항목 id", required = true, example = "1")
             @PathVariable(value = "subtaskId") Long id
     ) {
-        subtaskService.delete(subtaskService.getById(id));
-        String responseMessage = "id = " + id + " 세부업무가 삭제되었습니다.";
+        Subtask subtask = subtaskService.getById(id);
+        String name = subtask.getName();
+        subtaskService.delete(subtask);
+        String responseMessage = "준비항목" + name + "이(가) 삭제되었습니다.";
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
 
-    @ApiOperation(value = "세부업무 수정")
-    @PutMapping("")
+    @ApiOperation(value = "준비항목 수정")
+    @PutMapping
     public ImgoingResponse<SubtaskDto> update (@RequestBody SubtaskDto dto){
         Subtask willUpdateSubtask = subtaskMapper.toEntity(dto);
         SubtaskDto subtaskDto = subtaskMapper.toDto(subtaskService.update(willUpdateSubtask));

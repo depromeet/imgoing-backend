@@ -27,7 +27,7 @@ public class RoutineDto {
         @ApiModelProperty(value = "업무 Id")
         private Long taskId;
 
-        @ApiModelProperty(value = "세부업무 목록 Id")
+        @ApiModelProperty(value = "준비항목 목록 Id")
         private List<Long> subtaskIdList;
     }
 
@@ -43,7 +43,7 @@ public class RoutineDto {
         @ApiModelProperty(value = "업무 모델")
         private TaskDto Task;
 
-        @ApiModelProperty(value = "세부업무 모델")
+        @ApiModelProperty(value = "준비항목 모델")
         private List<SubtaskDto> subtaskList;
     }
 }
