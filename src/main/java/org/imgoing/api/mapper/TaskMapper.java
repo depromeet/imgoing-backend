@@ -10,8 +10,6 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.IGNORE) // 일치하지 않는 필드를 무시
 
 public interface TaskMapper {
-    @Mapping(target = "id", expression = "java(task.getId())")
-    @Mapping(target = "name", expression = "java(task.getName())")
     TaskDto toDto(Task task);
 
     Task toEntity(TaskDto dto);
