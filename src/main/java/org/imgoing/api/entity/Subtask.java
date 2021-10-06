@@ -24,6 +24,9 @@ public class Subtask extends BaseTime {
     @Column(nullable = false)
     private Integer time;
 
+    @Column(nullable = false)
+    private Boolean isLast;
+
 //    @ManyToOne
 //    @JsonIgnore
 //    @JoinColumn(name = "user_id")
