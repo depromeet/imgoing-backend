@@ -11,5 +11,7 @@ import org.mapstruct.ReportingPolicy;
 public interface SubtaskMapper {
     SubtaskDto toDto(Subtask subtask);
 
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "modifiedAt", ignore = true)
     Subtask toEntity(SubtaskDto dto);
 }
