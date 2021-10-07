@@ -2,25 +2,17 @@ package org.imgoing.api.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.dto.RoutineDto;
 import org.imgoing.api.entity.Routine;
 import org.imgoing.api.entity.Subtask;
-import org.imgoing.api.entity.Task;
 import org.imgoing.api.mapper.RoutineMapper;
-import org.imgoing.api.mapper.SubtaskMapper;
-import org.imgoing.api.service.TaskService;
 import org.imgoing.api.service.RoutineService;
-import org.imgoing.api.service.SubtaskService;
+import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,30 +22,58 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/routines")
 public class RoutineController {
     private final RoutineService routineService;
-    private final TaskService taskService;
-    private final SubtaskService subtaskService;
     private final RoutineMapper routineMapper;
 
     @ApiOperation(value = "루틴 생성")
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody RoutineDto.Create dto) {
-        Task task = Task.builder().id(dto.getTaskId()).build();
-
+    public ImgoingResponse<RoutineDto.Read> create(@RequestBody RoutineDto.Create dto) {
         List<Subtask> subtaskList = dto.getSubtaskIdList()
                 .stream()
                 .map(subtaskId -> Subtask.builder().id(subtaskId).build())
                 .collect(Collectors.toList());
 
-//        Task task = taskService.getById(dto.getTaskId());
-//
-//        List<Subtask> subtaskList = dto.getSubtaskIdList()
-//                .stream()
-//                .map(subtaskService::getById)
-//                .collect(Collectors.toList());
+        Routine newRoutine = routineMapper.toEntityForPost(0L, subtaskList);
 
-        Routine newRoutine = routineMapper.toEntityForPost(task, subtaskList);
+        return new ImgoingResponse<>(routineMapper.toDto(routineService.create(newRoutine)), HttpStatus.CREATED);
+    }
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(routineMapper.toDto(routineService.create(newRoutine)));
+    @ApiOperation(value = "루틴 조회")
+    @GetMapping("/{routineId}")
+    public ImgoingResponse<RoutineDto.Read> getById(@ApiParam(value = "루틴 id", required = true, example = "1")
+                                             @PathVariable(value = "routineId") Long id) {
+        Routine routine = routineService.getById(id);
+
+        return new ImgoingResponse<>(routineMapper.toDto(routine));
+    }
+
+    @ApiOperation(value = "루틴 리스트 전체 조회")
+    @GetMapping("/all")
+    public ImgoingResponse<List<RoutineDto.Read>> getListAll() {
+        List<RoutineDto.Read> routineDtoList = routineService.getListAll().stream()
+                .map(routineMapper::toDto)
+                .collect(Collectors.toList());
+
+        return new ImgoingResponse<>(routineDtoList);
+    }
+
+    @ApiOperation(value = "루틴 수정")
+    @PutMapping("/{routineId}")
+    public ImgoingResponse<RoutineDto.Read> update(@RequestBody RoutineDto.Read routineDto,
+                                                   @ApiParam(value = "루틴 id", required = true, example = "1")
+                                                   @PathVariable(value = "routineId") Long id) {
+        Routine newRoutine = routineMapper.toEntityForPut(routineDto, id);
+
+        return new ImgoingResponse<>(routineMapper.toDto(routineService.update(newRoutine)), HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "루틴 삭제")
+    @DeleteMapping("/{routineId}")
+    public ImgoingResponse<String> delete(@ApiParam(value = "루틴 id", required = true, example = "1")
+                                              @PathVariable(value = "routineId") Long id) {
+        Routine routine = routineService.getById(id);
+
+        routineService.delete(routine);
+        String responseMessage = "id = " + id + "루틴이 삭제되었습니다.";
+        return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
 }
