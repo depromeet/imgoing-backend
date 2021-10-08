@@ -1,4 +1,4 @@
-package org.imgoing.api.entity;
+package org.imgoing.api.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;

@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.dto.SubtaskDto;
-import org.imgoing.api.entity.Subtask;
+import org.imgoing.api.domain.entity.Subtask;
 import org.imgoing.api.mapper.SubtaskMapper;
 import org.imgoing.api.service.SubtaskService;
 import org.imgoing.api.support.ImgoingResponse;

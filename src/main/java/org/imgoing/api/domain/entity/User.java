@@ -1,4 +1,4 @@
-package org.imgoing.api.entity;
+package org.imgoing.api.domain.entity;
 
 import lombok.*;
 import org.imgoing.api.config.BaseTime;

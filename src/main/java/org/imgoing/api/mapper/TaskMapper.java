@@ -1,9 +1,8 @@
 package org.imgoing.api.mapper;
 
 import org.imgoing.api.dto.TaskDto;
-import org.imgoing.api.entity.Task;
+import org.imgoing.api.domain.entity.Task;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", // 스프링 컨테이너에 객체로 관리

@@ -1,8 +1,8 @@
 package org.imgoing.api.mapper;
 
 import org.imgoing.api.dto.RoutineDto;
-import org.imgoing.api.entity.Routine;
-import org.imgoing.api.entity.Subtask;
+import org.imgoing.api.domain.entity.Routine;
+import org.imgoing.api.domain.entity.Subtask;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
