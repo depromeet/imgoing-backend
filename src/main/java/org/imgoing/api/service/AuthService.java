@@ -5,6 +5,7 @@ import org.imgoing.api.domain.entity.CertificateAuthority;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.domain.verifier.KakaoTokenVerifier;
 import org.imgoing.api.domain.vo.TokenPayload;
+import org.imgoing.api.dto.auth.DummyLoginRequest;
 import org.imgoing.api.dto.auth.SocialLoginRequest;
 import org.imgoing.api.dto.auth.TokenVerifiedResponse;
 import org.imgoing.api.dto.auth.TokenVerifyRequest;
@@ -23,11 +24,9 @@ public class AuthService {
     private final CertificateAuthority ca;
 
     @Transactional(propagation = Propagation.MANDATORY)
-    User createUser(String email, String name, String profile) {
+    User createUser(String email, String name) {
         User willSaveUser = User.builder()
                 .email(email)
-                .name(name)
-                .profile(profile)
                 .nickname(name)
                 .build();
         return userRepository.save(willSaveUser);
@@ -40,10 +39,15 @@ public class AuthService {
         if (!verifiedResponse.isVerified()) {
             throw new ImgoingException(ImgoingError.BAD_REQUEST);
         }
-        String email = socialLoginRequest.getEmail();
-        String name = socialLoginRequest.getName();
-        String profile = socialLoginRequest.getProfile();
-        User user = userRepository.findByEmail(socialLoginRequest.getEmail()).orElse(createUser(email, name, profile));
+        User user = userRepository.findByEmail(verifiedResponse.getEmail())
+                .orElseGet(() -> createUser(verifiedResponse.getEmail(), verifiedResponse.getName()));
+        return ca.makeToken(new TokenPayload(user.getId(), user.getEmail()));
+    }
+
+    @Transactional
+    public String dummyLogin (DummyLoginRequest dummyLoginRequest) {
+        User user = userRepository.findByEmail(dummyLoginRequest.getEmail())
+                .orElseGet(() -> createUser(dummyLoginRequest.getEmail(), dummyLoginRequest.getNickname()));
         return ca.makeToken(new TokenPayload(user.getId(), user.getEmail()));
     }
 }

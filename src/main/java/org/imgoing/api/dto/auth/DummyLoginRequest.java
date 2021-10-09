@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class SocialLoginRequest {
-    private final String accessToken;
+public class DummyLoginRequest {
+    private final String email;
+    private final String nickname;
 }

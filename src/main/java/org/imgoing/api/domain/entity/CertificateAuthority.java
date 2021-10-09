@@ -18,14 +18,14 @@ import java.security.Key;
 
 @Component
 public class CertificateAuthority {
-    @Value("${SECRET_KEY}")
-    private String SECRET_KEY;
+    @Value("${keys.jwtSecretKey}")
+    private String secretKey;
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public String makeToken(TokenPayload payload) {
         SignatureAlgorithm  signatureAlgorithm= SignatureAlgorithm.HS256;
-        byte[] secretKeyBytes = DatatypeConverter.parseBase64Binary(SECRET_KEY);
+        byte[] secretKeyBytes = DatatypeConverter.parseBase64Binary(secretKey);
         Key signingKey = new SecretKeySpec(secretKeyBytes, signatureAlgorithm.getJcaName());
         try {
             return Jwts.builder()
@@ -39,7 +39,7 @@ public class CertificateAuthority {
 
     public TokenPayload decrypt (String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
+                .setSigningKey(DatatypeConverter.parseBase64Binary(secretKey))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

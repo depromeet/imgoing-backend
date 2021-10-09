@@ -19,13 +19,7 @@ public class User extends BaseTime {
     private Long id;
 
     @Column(nullable = false, length = 50)
-    private String name;
-
-    @Column(nullable = false, length = 30)
     private String nickname;
-
-    @Column(length = 50, nullable = false, unique = true)
-    private String phone;
 
     @Column(length = 50, nullable = false, unique = true)
     private String email;
