@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.dto.PlanDto;
-import org.imgoing.api.entity.Plan;
+import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.service.PlanService;
 import org.imgoing.api.support.ImgoingResponse;

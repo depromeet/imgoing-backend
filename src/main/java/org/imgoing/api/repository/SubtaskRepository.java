@@ -1,6 +1,6 @@
 package org.imgoing.api.repository;
 
-import org.imgoing.api.entity.Subtask;
+import org.imgoing.api.domain.entity.Subtask;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

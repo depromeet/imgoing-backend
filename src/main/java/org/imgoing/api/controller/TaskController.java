@@ -5,13 +5,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.dto.TaskDto;
-import org.imgoing.api.entity.Task;
+import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.mapper.TaskMapper;
 import org.imgoing.api.service.TaskService;
 import org.imgoing.api.service.RoutineService;
 import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
