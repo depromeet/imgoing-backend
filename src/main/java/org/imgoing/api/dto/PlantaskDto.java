@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RoutineDto {
+public class PlantaskDto {
     @SuperBuilder
     @Getter
     @Setter

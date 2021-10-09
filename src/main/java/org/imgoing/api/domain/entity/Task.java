@@ -25,7 +25,7 @@ public class Task extends BaseTime {
     @JsonManagedReference
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "routineId", referencedColumnName = "id")
-    private Routine routine;
+    private Plantask plantask;
 
     public void modifyRoutine(Task newTask) {
         this.name = newTask.getName();
