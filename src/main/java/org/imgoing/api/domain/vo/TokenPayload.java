@@ -1,13 +1,15 @@
 package org.imgoing.api.domain.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class TokenPayload {
-    private final long id;
-    private final String email;
+    private long id;
+    private String email;
 
     public boolean isSame(TokenPayload anotherTokenPayload) {
         return id == anotherTokenPayload.getId() && email == anotherTokenPayload.getEmail();

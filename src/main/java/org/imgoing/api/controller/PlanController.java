@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.PlanDto;
 import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.mapper.PlanMapper;
@@ -25,7 +26,7 @@ public class PlanController {
 
     @ApiOperation(value = "일정 생성")
     @PostMapping("")
-    public ImgoingResponse<Plan> create(@RequestBody PlanDto planDto) {
+    public ImgoingResponse<Plan> create(User user, @RequestBody PlanDto planDto) {
         Plan newPlan = planMapper.toEntity(planDto);
         Plan savedPlan = planService.create(newPlan);
         return new ImgoingResponse<>(savedPlan, HttpStatus.CREATED);

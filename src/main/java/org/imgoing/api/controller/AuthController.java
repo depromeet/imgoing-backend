@@ -8,6 +8,7 @@ import org.imgoing.api.dto.auth.SocialLoginRequest;
 import org.imgoing.api.service.AuthService;
 import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,14 +21,14 @@ public class AuthController {
 
     @ApiOperation(value = "토큰 검증 및 생성")
     @PostMapping("")
-    public ImgoingResponse<String> socialLogin(SocialLoginRequest request) {
+    public ImgoingResponse<String> socialLogin(@RequestBody SocialLoginRequest request) {
         String token = authService.socialLogin(request);
         return new ImgoingResponse<>(token);
     }
 
     @ApiOperation(value = "테스트용 유저 생성 및 토큰 발급")
     @PostMapping("/dummy")
-    public ImgoingResponse<String> dummyLogin(DummyLoginRequest request) {
+    public ImgoingResponse<String> dummyLogin(@RequestBody DummyLoginRequest request) {
         String token = authService.dummyLogin(request);
         return new ImgoingResponse<>(token);
     }
