@@ -9,7 +9,7 @@ import org.imgoing.api.dto.TaskDto;
 import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.mapper.TaskMapper;
 import org.imgoing.api.service.TaskService;
-import org.imgoing.api.service.RoutineService;
+import org.imgoing.api.service.PlantaskService;
 import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/tasks")
 public class TaskController {
     private final TaskService taskService;
-    private final RoutineService routineService;
+    private final PlantaskService plantaskService;
     private final TaskMapper taskMapper;
 
     @ApiOperation(value = "업무 생성")
