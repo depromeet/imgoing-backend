@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@Api(tags = "준비항목 API")
+@Api(tags = "준비항목 관련 API")
 @RequestMapping("/api/v1/tasks")
 public class TaskController {
     private final TaskService taskService;
@@ -77,7 +77,7 @@ public class TaskController {
         Task task = taskService.getById(id);
         String name = task.getName();
         taskService.delete(task);
-        String responseMessage = "준비항목" + name + "이(가) 삭제되었습니다.";
+        String responseMessage = "준비항목 " + name + " 이(가) 삭제되었습니다.";
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
 

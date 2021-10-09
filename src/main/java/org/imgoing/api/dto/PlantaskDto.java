@@ -22,7 +22,7 @@ public class PlantaskDto {
     @AllArgsConstructor
     public static class Create {
         @ApiModelProperty(value = "준비항목 목록 Id")
-        private List<Long> subtaskIdList;
+        private List<Long> taskIdList;
     }
 
     @SuperBuilder
@@ -35,6 +35,6 @@ public class PlantaskDto {
         private Long id;
 
         @ApiModelProperty(value = "준비항목 모델")
-        private List<TaskDto> subtaskList;
+        private List<TaskDto> taskList;
     }
 }

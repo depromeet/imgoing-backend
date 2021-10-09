@@ -1,6 +1,5 @@
 package org.imgoing.api.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.imgoing.api.config.BaseTime;
 
@@ -22,9 +21,8 @@ public class Preset extends BaseTime {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @JsonManagedReference
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "routineId", referencedColumnName = "id")
+    @JoinColumn(name = "plantaskId", referencedColumnName = "id")
     private Plantask plantask;
 
     public void modifyPreset(Preset newPreset) {

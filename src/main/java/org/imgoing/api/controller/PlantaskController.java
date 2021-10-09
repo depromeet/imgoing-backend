@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@Api(tags = "구성된 준비항목 API")
+@Api(tags = "구성된 준비항목 관련 API")
 @RequestMapping("/api/v1/plantasks")
 public class PlantaskController {
     private final PlantaskService plantaskService;
@@ -28,9 +28,9 @@ public class PlantaskController {
     @ApiOperation(value = "구성된 준비항목 생성")
     @PostMapping
     public ImgoingResponse<PlantaskDto.Read> create(User user, @RequestBody PlantaskDto.Create dto) {
-        List<Task> taskList = dto.getSubtaskIdList()
+        List<Task> taskList = dto.getTaskIdList()
                 .stream()
-                .map(subtaskId -> Task.builder().id(subtaskId).build())
+                .map(taskId -> Task.builder().id(taskId).build())
                 .collect(Collectors.toList());
 
         Plantask newPlantask = plantaskMapper.toEntityForPost(0L, taskList);

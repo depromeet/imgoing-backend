@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
-@Api(tags = "프리셋 API (v1에서 사용하지 않음)")
+@Api(tags = "프리셋 관련 API (v1에서 사용하지 않음)")
 @RequestMapping("/api/v1/presets")
 public class PresetController {
     private final PresetService presetService;
@@ -72,8 +72,10 @@ public class PresetController {
             @ApiParam(value = "프리셋 id", required = true, example = "1")
             @PathVariable(value = "presetId") Long id
     ) {
-        presetService.delete(presetService.getById(id));
-        String responseMessage = "id = " + id + " 프리셋이 삭제되었습니다.";
+        Preset preset = presetService.getById(id);
+        String responseMessage = "프리셋 " + preset.getName() + " 이(가) 삭제되었습니다.";
+        presetService.delete(preset);
+
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
 
