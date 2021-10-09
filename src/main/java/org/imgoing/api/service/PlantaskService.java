@@ -36,7 +36,7 @@ public class PlantaskService {
         Long id = newPlantask.getId();
         Plantask oldPlantask = plantaskRepository.getById(id);
 
-        oldPlantask.modifyRoutine(newPlantask.getSubtaskList());
+        oldPlantask.modifyRoutine(newPlantask.getTaskList());
         return plantaskRepository.save(oldPlantask);
     }
 
