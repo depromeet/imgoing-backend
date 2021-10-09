@@ -1,4 +1,4 @@
-package org.imgoing.api.dto;
+package org.imgoing.api.dto.auth;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package org.imgoing.api.dto;
+package org.imgoing.api.dto.auth;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;

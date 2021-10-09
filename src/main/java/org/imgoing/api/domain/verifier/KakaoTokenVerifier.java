@@ -3,9 +3,9 @@ package org.imgoing.api.domain.verifier;
 import com.google.gson.Gson;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.imgoing.api.dto.KakaoTokenVerifiedResponse;
-import org.imgoing.api.dto.TokenVerifiedResponse;
-import org.imgoing.api.dto.TokenVerifyRequest;
+import org.imgoing.api.dto.auth.KakaoTokenVerifiedResponse;
+import org.imgoing.api.dto.auth.TokenVerifiedResponse;
+import org.imgoing.api.dto.auth.TokenVerifyRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @NoArgsConstructor
 @Component
-class KakaoTokenVerifier {
+public class KakaoTokenVerifier {
     private static final RestTemplate kakaoVerifyClient = new RestTemplate();
     private static final String url = "https://kapi.kakao.com/v2/user/me";
     private final TokenVerifiedResponse failResponse = TokenVerifiedResponse.builder().verified(false).build();
