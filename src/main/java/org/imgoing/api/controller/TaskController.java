@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.TaskDto;
 import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.mapper.TaskMapper;
@@ -27,7 +28,7 @@ public class TaskController {
 
     @ApiOperation(value = "업무 생성")
     @PostMapping("")
-    public ImgoingResponse<Task> create(@RequestBody TaskDto dto) {
+    public ImgoingResponse<Task> create(User user, @RequestBody TaskDto dto) {
         Task newTask = taskMapper.toEntity(dto);
         Task savedTask = taskService.create(newTask);
         return new ImgoingResponse<>(savedTask, HttpStatus.CREATED);
@@ -36,6 +37,7 @@ public class TaskController {
     @ApiOperation(value = "업무 조회")
     @GetMapping("/{taskId}")
     public ImgoingResponse<Task> get(
+            User user,
             @ApiParam(value = "업무 id", required = true, example = "1")
             @PathVariable(value = "taskId") Long id
     ) {
@@ -66,6 +68,7 @@ public class TaskController {
     @ApiOperation(value = "업무 삭제")
     @DeleteMapping("/{taskId}")
     public ImgoingResponse<String> delete(
+            User user,
             @ApiParam(value = "업무 id", required = true, example = "1")
             @PathVariable(value = "taskId") Long id
     ) {
@@ -76,7 +79,7 @@ public class TaskController {
 
     @ApiOperation(value = "업무 정보 수정")
     @PutMapping("")
-    public ImgoingResponse<TaskDto> update(@RequestBody TaskDto dto){
+    public ImgoingResponse<TaskDto> update(User user, @RequestBody TaskDto dto){
         Task newTask = taskMapper.toEntity(dto);
         TaskDto updatedTaskDto = taskMapper.toDto(taskService.update(newTask));
         return new ImgoingResponse<>(updatedTaskDto, HttpStatus.CREATED);
