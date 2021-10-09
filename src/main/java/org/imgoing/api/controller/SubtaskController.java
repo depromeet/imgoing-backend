@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.SubtaskDto;
 import org.imgoing.api.domain.entity.Subtask;
 import org.imgoing.api.mapper.SubtaskMapper;
@@ -25,7 +26,10 @@ public class SubtaskController {
 
     @ApiOperation(value = "준비항목 생성")
     @PostMapping
-    public ImgoingResponse<SubtaskDto> create(@RequestBody SubtaskDto dto) {
+    public ImgoingResponse<SubtaskDto> create(
+            User user,
+            @RequestBody SubtaskDto dto
+    ) {
         Subtask newSubtask = subtaskMapper.toEntity(dto);
         Subtask savedSubtask = subtaskService.create(newSubtask);
         return new ImgoingResponse<>(subtaskMapper.toDto(savedSubtask), HttpStatus.CREATED);
@@ -34,6 +38,7 @@ public class SubtaskController {
     @ApiOperation(value = "준비항목 조회")
     @GetMapping("/{subtaskId}")
     public ImgoingResponse<SubtaskDto> get(
+            User user,
             @ApiParam(value = "준비항목 id", required = true, example = "1")
             @PathVariable(value = "subtaskId") Long id
     ) {
@@ -65,6 +70,7 @@ public class SubtaskController {
     @ApiOperation(value = "준비항목 삭제")
     @DeleteMapping("/{subtaskId}")
     public ImgoingResponse<String> delete(
+            User user,
             @ApiParam(value = "준비항목 id", required = true, example = "1")
             @PathVariable(value = "subtaskId") Long id
     ) {
@@ -77,7 +83,7 @@ public class SubtaskController {
 
     @ApiOperation(value = "준비항목 수정")
     @PutMapping
-    public ImgoingResponse<SubtaskDto> update (@RequestBody SubtaskDto dto){
+    public ImgoingResponse<SubtaskDto> update (User user, @RequestBody SubtaskDto dto){
         Subtask willUpdateSubtask = subtaskMapper.toEntity(dto);
         SubtaskDto subtaskDto = subtaskMapper.toDto(subtaskService.update(willUpdateSubtask));
         return new ImgoingResponse<>(subtaskDto);

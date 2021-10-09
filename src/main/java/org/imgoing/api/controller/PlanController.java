@@ -33,12 +33,9 @@ public class PlanController {
     }
 
     @ApiOperation(value = "일정 조회")
-    @GetMapping("/{userId}")
-    public ImgoingResponse<List<PlanDto>> getList(
-            @ApiParam(value = "회원 id", required = true, example = "1")
-            @PathVariable(value = "userId") Long userId
-    ) {
-        List<PlanDto> planDtoList = planService.getPlanByUserId(userId).stream()
+    @GetMapping("")
+    public ImgoingResponse<List<PlanDto>> getList(User user) {
+        List<PlanDto> planDtoList = planService.getPlanByUserId(user.getId()).stream()
                 .map(planMapper::toDto)
                 .collect(Collectors.toList());
         return new ImgoingResponse<>(planDtoList);
@@ -47,6 +44,7 @@ public class PlanController {
     @ApiOperation(value = "일정 삭제")
     @DeleteMapping("/{planId}")
     public ImgoingResponse<String> delete(
+            User user,
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "planId") Long id
     ) {
