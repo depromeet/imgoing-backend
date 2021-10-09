@@ -9,11 +9,11 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "task_tb")
+@Table(name = "preset_tb")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Task extends BaseTime {
+public class Preset extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -27,7 +27,7 @@ public class Task extends BaseTime {
     @JoinColumn(name = "routineId", referencedColumnName = "id")
     private Plantask plantask;
 
-    public void modifyRoutine(Task newTask) {
-        this.name = newTask.getName();
+    public void modifyPreset(Preset newPreset) {
+        this.name = newPreset.getName();
     }
 }

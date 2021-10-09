@@ -11,7 +11,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        uses = { TaskMapper.class, SubtaskMapper.class })
+        uses = { PresetMapper.class, SubtaskMapper.class })
 
 public interface PlantaskMapper {
     PlantaskDto.Read toDto(Plantask plantask);
