@@ -36,5 +36,6 @@ public class Task extends BaseTime {
     public void modifyTask(Task newTask) {
         this.name = newTask.getName();
         this.time = newTask.getTime();
+        this.isBookmarked = newTask.getIsBookmarked();
     }
 }

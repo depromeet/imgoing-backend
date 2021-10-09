@@ -1,5 +1,6 @@
 package org.imgoing.api.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import org.imgoing.api.config.BaseTime;
 
@@ -20,11 +21,16 @@ public class Plantask extends BaseTime {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @JsonBackReference
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "planId", referencedColumnName = "id")
+    private Plan plan;
+
     @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "taskId", referencedColumnName = "id")
     private List<Task> taskList = new ArrayList<>();
 
-    public void modifyRoutine(List<Task> taskList) {
+    public void modifyPlantask(List<Task> taskList) {
         this.taskList = taskList;
     }
 }
