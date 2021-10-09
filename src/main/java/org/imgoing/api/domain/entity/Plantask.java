@@ -21,10 +21,10 @@ public class Plantask extends BaseTime {
     private Long id;
 
     @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "subtaskId", referencedColumnName = "id")
-    private List<Subtask> subtaskList = new ArrayList<>();
+    @JoinColumn(name = "taskId", referencedColumnName = "id")
+    private List<Task> taskList = new ArrayList<>();
 
-    public void modifyRoutine(List<Subtask> subtaskList) {
-        this.subtaskList = subtaskList;
+    public void modifyRoutine(List<Task> taskList) {
+        this.taskList = taskList;
     }
 }

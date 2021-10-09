@@ -11,8 +11,8 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "subtask_tb")
-public class Subtask extends BaseTime {
+@Table(name = "task_tb")
+public class Task extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -25,7 +25,7 @@ public class Subtask extends BaseTime {
     private Integer time;
 
     @Column(nullable = false)
-    private Boolean isLast;
+    private Boolean isBookmarked;
 
 //    @ManyToOne
 //    @JsonIgnore
@@ -33,8 +33,8 @@ public class Subtask extends BaseTime {
 //    @OnDelete(action = OnDeleteAction.CASCADE)
 //    private User user;
 
-    public void modifyTask(Subtask newSubtask) {
-        this.name = newSubtask.getName();
-        this.time = newSubtask.getTime();
+    public void modifyTask(Task newTask) {
+        this.name = newTask.getName();
+        this.time = newTask.getTime();
     }
 }

@@ -35,6 +35,6 @@ public class PlantaskDto {
         private Long id;
 
         @ApiModelProperty(value = "준비항목 모델")
-        private List<SubtaskDto> subtaskList;
+        private List<TaskDto> subtaskList;
     }
 }

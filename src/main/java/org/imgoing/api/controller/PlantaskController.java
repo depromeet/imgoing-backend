@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.PlantaskDto;
 import org.imgoing.api.domain.entity.Plantask;
-import org.imgoing.api.domain.entity.Subtask;
+import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.mapper.PlantaskMapper;
 import org.imgoing.api.service.PlantaskService;
 import org.imgoing.api.support.ImgoingResponse;
@@ -28,12 +28,12 @@ public class PlantaskController {
     @ApiOperation(value = "구성된 준비항목 생성")
     @PostMapping
     public ImgoingResponse<PlantaskDto.Read> create(User user, @RequestBody PlantaskDto.Create dto) {
-        List<Subtask> subtaskList = dto.getSubtaskIdList()
+        List<Task> taskList = dto.getSubtaskIdList()
                 .stream()
-                .map(subtaskId -> Subtask.builder().id(subtaskId).build())
+                .map(subtaskId -> Task.builder().id(subtaskId).build())
                 .collect(Collectors.toList());
 
-        Plantask newPlantask = plantaskMapper.toEntityForPost(0L, subtaskList);
+        Plantask newPlantask = plantaskMapper.toEntityForPost(0L, taskList);
 
         return new ImgoingResponse<>(plantaskMapper.toDto(plantaskService.create(newPlantask)), HttpStatus.CREATED);
     }
