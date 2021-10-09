@@ -1,7 +1,7 @@
 package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
-import org.imgoing.api.entity.Subtask;
+import org.imgoing.api.domain.entity.Subtask;
 import org.imgoing.api.repository.SubtaskRepository;
 import org.imgoing.api.support.ImgoingError;
 import org.imgoing.api.support.ImgoingException;

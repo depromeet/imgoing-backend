@@ -1,7 +1,7 @@
 package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
-import org.imgoing.api.entity.Routine;
+import org.imgoing.api.domain.entity.Routine;
 import org.imgoing.api.repository.RoutineRepository;
 import org.imgoing.api.support.ImgoingError;
 import org.imgoing.api.support.ImgoingException;
