@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RoutineDto {
+public class PlantaskDto {
     @SuperBuilder
     @Getter
     @Setter
@@ -22,7 +22,7 @@ public class RoutineDto {
     @AllArgsConstructor
     public static class Create {
         @ApiModelProperty(value = "준비항목 목록 Id")
-        private List<Long> subtaskIdList;
+        private List<Long> taskIdList;
     }
 
     @SuperBuilder
@@ -35,6 +35,6 @@ public class RoutineDto {
         private Long id;
 
         @ApiModelProperty(value = "준비항목 모델")
-        private List<SubtaskDto> subtaskList;
+        private List<TaskDto> taskList;
     }
 }

@@ -1,8 +1,8 @@
 package org.imgoing.api.mapper;
 
-import org.imgoing.api.dto.RoutineDto;
-import org.imgoing.api.domain.entity.Routine;
-import org.imgoing.api.domain.entity.Subtask;
+import org.imgoing.api.dto.PlantaskDto;
+import org.imgoing.api.domain.entity.Plantask;
+import org.imgoing.api.domain.entity.Task;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -11,18 +11,18 @@ import java.util.List;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        uses = { TaskMapper.class, SubtaskMapper.class })
+        uses = { PresetMapper.class, TaskMapper.class })
 
-public interface RoutineMapper {
-    RoutineDto.Read toDto(Routine routine);
+public interface PlantaskMapper {
+    PlantaskDto.Read toDto(Plantask plantask);
 
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "modifiedAt", ignore = true)
     @Mapping(target = "id", ignore = true)
-    Routine toEntityForPost(Long routineId, List<Subtask> subtaskList); // routineId는 더미 데이터
+    Plantask toEntityForPost(Long routineId, List<Task> taskList); // routineId는 더미 데이터
 
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "modifiedAt", ignore = true)
     @Mapping(target = "id", source = "routineId")
-    Routine toEntityForPut(RoutineDto.Read routineDto, Long routineId);
+    Plantask toEntityForPut(PlantaskDto.Read routineDto, Long routineId);
 }

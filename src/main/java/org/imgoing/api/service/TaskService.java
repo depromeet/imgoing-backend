@@ -23,7 +23,7 @@ public class TaskService {
     @Transactional(readOnly = true)
     public Task getById(Long id){
         return taskRepository.findById(id)
-                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 업무입니다."));
+                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 세부업무입니다."));
     }
 
     @Transactional(readOnly = true)
@@ -46,7 +46,7 @@ public class TaskService {
         Long id = newTask.getId();
         Task oldTask = getById(id);
 
-        oldTask.modifyRoutine(newTask);
+        oldTask.modifyTask(newTask);
         return taskRepository.save(oldTask);
     }
 }
