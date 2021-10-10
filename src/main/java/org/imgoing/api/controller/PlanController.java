@@ -25,27 +25,38 @@ public class PlanController {
     private final PlanMapper planMapper;
 
     @ApiOperation(value = "일정 생성")
-    @PostMapping("")
-    public ImgoingResponse<Plan> create(User user, @RequestBody PlanDto planDto) {
+    @PostMapping
+    public ImgoingResponse<PlanDto> create(User user, @RequestBody PlanDto planDto) {
         Plan newPlan = planMapper.toEntity(planDto);
         Plan savedPlan = planService.create(newPlan);
-        return new ImgoingResponse<>(savedPlan, HttpStatus.CREATED);
+        return new ImgoingResponse<>(planMapper.toDto(savedPlan), HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "일정 조회")
-    @GetMapping("")
+    @ApiOperation(value = "일정 전체 조회")
+    @GetMapping
     public ImgoingResponse<List<PlanDto>> getList(User user) {
         List<PlanDto> planDtoList = planService.getPlanByUserId(user.getId()).stream()
                 .map(planMapper::toDto)
                 .collect(Collectors.toList());
-        return new ImgoingResponse<>(planDtoList);
+        return new ImgoingResponse<>(planDtoList, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "일정 조회")
+    @GetMapping("/{planId}")
+    public ImgoingResponse<PlanDto> getPlan(
+            User user,
+            @ApiParam(value = "일정 id", required = true, example = "1")
+            @PathVariable(value = "planId") Long id
+    ) {
+        Plan plan = planService.getPlanById(id);
+        return new ImgoingResponse<>(planMapper.toDto(plan), HttpStatus.OK);
     }
 
     @ApiOperation(value = "일정 삭제")
     @DeleteMapping("/{planId}")
     public ImgoingResponse<String> delete(
             User user,
-            @ApiParam(value = "루틴 id", required = true, example = "1")
+            @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long id
     ) {
         planService.delete(planService.getPlanById(id));
