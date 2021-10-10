@@ -24,28 +24,24 @@ public class Plan extends BaseTime {
     private String name;
 
     @Column(nullable = false)
-    private String departure_name;
+    private String arrivalName;
 
     @Column(nullable = false)
-    private Double departure_lat;
+    private Double arrivalLat;
 
     @Column(nullable = false)
-    private Double departure_lng;
+    private Double arrivalLng;
 
     @Column(nullable = false)
-    private String arrival_name;
+    private LocalDateTime arrivalAt;
 
-    @Column(nullable = false)
-    private Double arrival_lat;
+    @Column
+    private String memo;
 
-    @Column(nullable = false)
-    private Double arrival_lng;
+    @Column
+    private String belongings;
 
-    @Column(nullable = false)
-    private LocalDateTime arrival_at;
-
-    @JsonManagedReference
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "plantaskId", referencedColumnName = "id")
-    private Plantask plantask;
+    @ManyToOne
+    @JoinColumn(name = "userId", referencedColumnName = "id")
+    private User user;
 }
