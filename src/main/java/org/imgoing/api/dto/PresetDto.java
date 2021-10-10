@@ -10,16 +10,10 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SubtaskDto {
-    @ApiModelProperty(value = "준비항목 id")
+public class PresetDto {
+    @ApiModelProperty(value = "프리셋 id")
     private Long id;
 
-    @ApiModelProperty(value = "준비항목 이름")
+    @ApiModelProperty(value = "프리셋 이름")
     private String name;
-
-    @ApiModelProperty(value = "준비항목 시간")
-    private Integer time;
-
-    @ApiModelProperty(value = "지속 여부")
-    private Boolean isLast;
 }

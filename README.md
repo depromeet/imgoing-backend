@@ -20,7 +20,7 @@
 ## 📋 ERD
 <br>
 
-[<img src="https://user-images.githubusercontent.com/54519245/134776142-1909e8bd-518b-48db-a7a3-4673babcb268.PNG">](https://www.erdcloud.com/d/XFemmajNJPdTXvZZF)
+[<img src="https://user-images.githubusercontent.com/54519245/136658170-e93ec9e9-5443-40bf-a70b-1108c2ba50d4.png">](https://www.erdcloud.com/d/o9zDCf7gBw4t6MMh8)
  
 <br>
 
@@ -65,3 +65,7 @@ hotfix : 출시 버전에서 발생한 버그를 수정 하는 브랜치
 **우아한 형제들 [우린 Git-Flow를 사용하고 있어요](https://woowabros.github.io/experience/2017/10/30/baemin-mobile-git-branch-strategy.html)** 참조
 
 <br>
+
+## 😍 Front-End Repository
+
+### [https://github.com/depromeet/imgoing-frontend](https://github.com/depromeet/imgoing-frontend)

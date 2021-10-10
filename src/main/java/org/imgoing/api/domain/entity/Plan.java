@@ -1,5 +1,6 @@
 package org.imgoing.api.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.imgoing.api.config.BaseTime;
 
@@ -42,4 +43,9 @@ public class Plan extends BaseTime {
 
     @Column(nullable = false)
     private LocalDateTime arrival_at;
+
+    @JsonManagedReference
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "plantaskId", referencedColumnName = "id")
+    private Plantask plantask;
 }

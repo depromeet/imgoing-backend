@@ -1,6 +1,5 @@
 package org.imgoing.api.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.imgoing.api.config.BaseTime;
 
@@ -9,25 +8,34 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "task_tb")
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "task_tb")
 public class Task extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     private String name;
 
-    @JsonManagedReference
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "routineId", referencedColumnName = "id")
-    private Routine routine;
+    @Column(nullable = false)
+    private Integer time;
 
-    public void modifyRoutine(Task newTask) {
+    @Column(nullable = false)
+    private Boolean isBookmarked;
+
+//    @ManyToOne
+//    @JsonIgnore
+//    @JoinColumn(name = "user_id")
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+//    private User user;
+
+    public void modifyTask(Task newTask) {
         this.name = newTask.getName();
+        this.time = newTask.getTime();
+        this.isBookmarked = newTask.getIsBookmarked();
     }
 }
