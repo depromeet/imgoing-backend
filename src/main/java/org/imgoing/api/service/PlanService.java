@@ -3,6 +3,7 @@ package org.imgoing.api.service;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.domain.entity.User;
+import org.imgoing.api.dto.PlanDto;
 import org.imgoing.api.repository.PlanRepository;
 import org.imgoing.api.support.ImgoingError;
 import org.imgoing.api.support.ImgoingException;
@@ -16,6 +17,12 @@ import java.util.List;
 public class PlanService {
     private final PlanRepository planRepository;
 
+    @Transactional
+    public Plan create(User user, Plan plan) {
+        plan.addUser(user);
+        return planRepository.save(plan);
+    }
+
     @Transactional(readOnly = true)
     public Plan getPlanById(Long id) {
         return planRepository.findById(id)
@@ -27,10 +34,17 @@ public class PlanService {
         return planRepository.findAll();
     }
 
+
     @Transactional
-    public Plan create(User user, Plan plan) {
-        plan.addUser(user);
-        return planRepository.save(plan);
+    public Plan update(PlanDto planDto) {
+        Plan plan = getPlanById(planDto.getId());
+
+        // User validation check
+        // validate(userId, plan);
+
+        planDto.update(plan);
+
+        return  planRepository.save(plan);
     }
 
     @Transactional

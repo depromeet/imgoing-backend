@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.domain.entity.Task;
 
 import java.time.LocalDateTime;
@@ -41,4 +42,14 @@ public class PlanDto {
 
     @ApiModelProperty(value = "준비항목")
     private List<Task> tasks;
+
+    public void update(Plan plan) {
+        plan.setName(this.name);
+        plan.setArrivalName(this.arrivalName);
+        plan.setArrivalLat(this.arrivalLat);
+        plan.setArrivalLng(this.arrivalLng);
+        plan.setArrivalAt(this.arrivalAt);
+        plan.setMemo(this.memo);
+        plan.setBelongings(this.belongings);
+    }
 }

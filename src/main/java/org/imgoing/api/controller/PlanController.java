@@ -9,6 +9,7 @@ import org.imgoing.api.dto.PlanDto;
 import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.service.PlanService;
+import org.imgoing.api.service.TaskService;
 import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,20 +23,21 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/plan")
 public class PlanController {
     private final PlanService planService;
+    private final TaskService taskService;
     private final PlanMapper planMapper;
 
     @ApiOperation(value = "일정 생성")
     @PostMapping
     public ImgoingResponse<PlanDto> create(User user, @RequestBody PlanDto planDto) {
         Plan plan = planMapper.toEntity(planDto);
-        // Task Service와 연결
+        // Task service와 연결
         Plan savedPlan = planService.create(user, plan);
         return new ImgoingResponse<>(planMapper.toDto(savedPlan), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "일정 전체 조회")
     @GetMapping
-    public ImgoingResponse<List<PlanDto>> getList(User user) {
+    public ImgoingResponse<List<PlanDto>> getAllPlans(User user) {
         List<PlanDto> planDtoList = planService.getPlanByUserId(user.getId()).stream()
                 .map(planMapper::toDto)
                 .collect(Collectors.toList());
@@ -51,6 +53,12 @@ public class PlanController {
     ) {
         Plan plan = planService.getPlanById(id);
         return new ImgoingResponse<>(planMapper.toDto(plan), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "일정 수정")
+    @PutMapping
+    public ImgoingResponse<PlanDto> update (User user, @RequestBody PlanDto planDto) {
+        return new ImgoingResponse<>(planMapper.toDto(planService.update(planDto)), HttpStatus.OK);
     }
 
     @ApiOperation(value = "일정 삭제")
