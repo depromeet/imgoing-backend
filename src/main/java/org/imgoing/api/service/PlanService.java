@@ -24,7 +24,6 @@ public class PlanService {
 
     @Transactional(readOnly = true)
     public List<Plan> getPlanByUserId(Long userId) {
-        // 일단 findAll
         return planRepository.findAll();
     }
 
