@@ -2,6 +2,7 @@ package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.Plan;
+import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.repository.PlanRepository;
 import org.imgoing.api.support.ImgoingError;
 import org.imgoing.api.support.ImgoingException;
@@ -28,8 +29,9 @@ public class PlanService {
     }
 
     @Transactional
-    public Plan create(Plan newPlan) {
-        return planRepository.save(newPlan);
+    public Plan create(User user, Plan plan) {
+        plan.addUser(user);
+        return planRepository.save(plan);
     }
 
     @Transactional

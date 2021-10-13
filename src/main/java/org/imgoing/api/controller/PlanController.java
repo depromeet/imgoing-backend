@@ -27,8 +27,9 @@ public class PlanController {
     @ApiOperation(value = "일정 생성")
     @PostMapping
     public ImgoingResponse<PlanDto> create(User user, @RequestBody PlanDto planDto) {
-        Plan newPlan = planMapper.toEntity(planDto);
-        Plan savedPlan = planService.create(newPlan);
+        Plan plan = planMapper.toEntity(planDto);
+        // Task Service와 연결
+        Plan savedPlan = planService.create(user, plan);
         return new ImgoingResponse<>(planMapper.toDto(savedPlan), HttpStatus.CREATED);
     }
 

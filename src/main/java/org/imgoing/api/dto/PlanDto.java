@@ -5,8 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.imgoing.api.domain.entity.Task;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @SuperBuilder
 @Getter
@@ -36,4 +38,7 @@ public class PlanDto {
 
     @ApiModelProperty(value = "챙길 물건들")
     private String belongings;
+
+    @ApiModelProperty(value = "준비항목")
+    private List<Task> tasks;
 }
