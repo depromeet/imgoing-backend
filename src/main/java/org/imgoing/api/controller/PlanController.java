@@ -1,9 +1,6 @@
 package org.imgoing.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.PlanDto;
@@ -15,6 +12,7 @@ import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,8 +27,11 @@ public class PlanController {
 
     @ApiOperation(value = "일정 생성")
     @PostMapping
-    @ApiResponse(code = 201, message = "일정 생성 성공", response = PlanDto.class)
-    public ImgoingResponse<PlanDto> create(User user, @RequestBody PlanDto planDto) {
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "일정 생성 성공", response = PlanDto.class),
+            @ApiResponse(code = 400, message = "일정 생성 실패")
+    })
+    public ImgoingResponse<PlanDto> create(User user, @Valid @RequestBody PlanDto planDto) {
         Plan plan = planMapper.toEntity(planDto);
         Plan savedPlan = planService.create(user, plan);
         // Task service와 연결
@@ -62,8 +63,11 @@ public class PlanController {
 
     @ApiOperation(value = "일정 수정")
     @PutMapping
-    @ApiResponse(code = 200, message = "일정 수정 성공", response = PlanDto.class)
-    public ImgoingResponse<PlanDto> update (User user, @RequestBody PlanDto planDto) {
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "일정 수정 성공", response = PlanDto.class),
+            @ApiResponse(code = 400, message = "일정 수정 실패")
+    })
+    public ImgoingResponse<PlanDto> update (User user, @Valid @RequestBody PlanDto planDto) {
         return new ImgoingResponse<>(planMapper.toDto(planService.update(planDto)));
     }
 
