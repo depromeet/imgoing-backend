@@ -1,6 +1,5 @@
 package org.imgoing.api.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.imgoing.api.config.BaseTime;
 
@@ -24,6 +23,15 @@ public class Plan extends BaseTime {
     private String name;
 
     @Column(nullable = false)
+    private String departureName;
+
+    @Column(nullable = false)
+    private Double departureLat;
+
+    @Column(nullable = false)
+    private Double departureLng;
+
+    @Column(nullable = false)
     private String arrivalName;
 
     @Column(nullable = false)
@@ -44,4 +52,8 @@ public class Plan extends BaseTime {
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
+
+    public void addUser(User user) {
+        this.user = user;
+    }
 }
