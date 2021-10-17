@@ -32,11 +32,11 @@ public class PlanDto {
     @ApiModelProperty(required = true, value = "출발 장소 이름", example = "서울대입구역 9번 출구")
     private String departureName;
 
-    @NotBlank(message = "도착 위도는 필수값 입니다.")
+    @NotBlank(message = "출발 위도는 필수값 입니다.")
     @ApiModelProperty(required = true, value = "출발 장소 위도", example = "37.481254")
     private Double departureLat;
 
-    @NotBlank(message = "도착 경도는 필수값 입니다.")
+    @NotBlank(message = "출발 경도는 필수값 입니다.")
     @ApiModelProperty(required = true, value = "출발 장소 경도", example = "126.953228")
     private Double departureLng;
 
