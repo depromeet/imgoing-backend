@@ -6,6 +6,7 @@ import org.imgoing.api.config.BaseTime;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -23,12 +24,23 @@ public class Routine extends BaseTime {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "taskId", referencedColumnName = "id")
-    private List<Task> tasks = new ArrayList<>();
+    @OneToMany(mappedBy = "routine", orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Routinetask> routinetasks = new ArrayList<>();
 
     public void modifyRoutine(Routine newRoutine) {
         this.name = newRoutine.getName();
-        this.tasks = newRoutine.getTasks();
+    }
+
+    public void setRoutinetasks(List<Task> tasks) {
+        this.routinetasks = tasks.stream()
+                .map(task -> Routinetask.builder()
+                        .routine(this)
+                        .task(task)
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<Task> getTaskList() {
+        return routinetasks.stream().map(Routinetask::getTask).collect(Collectors.toList());
     }
 }

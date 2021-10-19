@@ -4,6 +4,8 @@ import lombok.*;
 import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,11 +29,8 @@ public class Task extends BaseTime {
     @Column(nullable = false)
     private Boolean isBookmarked;
 
-//    @ManyToOne
-//    @JsonIgnore
-//    @JoinColumn(name = "user_id")
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-//    private User user;
+    @OneToMany(mappedBy = "task")
+    private List<Routinetask> routinetasks = new ArrayList<>();
 
     public void modifyTask(Task newTask) {
         this.name = newTask.getName();
