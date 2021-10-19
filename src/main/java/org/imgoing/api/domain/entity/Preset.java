@@ -4,15 +4,18 @@ import lombok.*;
 import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "preset_tb")
+@Table(name = "routine_tb")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Preset extends BaseTime {
+public class Routine extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -21,11 +24,23 @@ public class Preset extends BaseTime {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "plantaskId", referencedColumnName = "id")
-    private Plantask plantask;
+    @OneToMany(mappedBy = "routine", orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Routinetask> routinetasks = new ArrayList<>();
 
-    public void modifyPreset(Preset newPreset) {
-        this.name = newPreset.getName();
+    public void modifyRoutine(Routine newRoutine) {
+        this.name = newRoutine.getName();
+    }
+
+    public void setRoutinetasks(List<Task> tasks) {
+        this.routinetasks = tasks.stream()
+                .map(task -> Routinetask.builder()
+                        .routine(this)
+                        .task(task)
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<Task> getTaskList() {
+        return routinetasks.stream().map(Routinetask::getTask).collect(Collectors.toList());
     }
 }
