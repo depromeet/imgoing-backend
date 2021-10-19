@@ -47,4 +47,14 @@ public class RoutineDto {
         @ApiModelProperty(value = "준비항목 목록")
         private List<TaskDto> tasks;
     }
+
+    @SuperBuilder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Update extends RoutineDto.Create {
+        @ApiModelProperty(value = "루틴 id")
+        private Long id;
+    }
 }
