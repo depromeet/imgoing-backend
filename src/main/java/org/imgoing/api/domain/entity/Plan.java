@@ -5,6 +5,8 @@ import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -52,6 +54,9 @@ public class Plan extends BaseTime {
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
+
+    @OneToMany(mappedBy = "plan", fetch = FetchType.EAGER)
+    private List<Plantask> plantasks;
 
     public void addUser(User user) {
         this.user = user;
