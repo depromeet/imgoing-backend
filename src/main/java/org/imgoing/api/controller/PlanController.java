@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RestController
 @Api(tags = "약속 관련 API")
-@RequestMapping("/api/v1/plan")
+@RequestMapping("/api/v1/plans")
 public class PlanController {
     private final PlanService planService;
     private final TaskService taskService;
@@ -32,11 +32,7 @@ public class PlanController {
             @ApiResponse(code = 400, message = "일정 생성 실패")
     })
     public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanDto planDto) {
-        Plan plan = planMapper.toEntity(planDto);
-        Plan savedPlan = planService.create(user, plan);
-        // Task service와 연결
-        // PlanTask 연결
-        return new ImgoingResponse<>(planMapper.toDto(savedPlan), HttpStatus.CREATED);
+        return new ImgoingResponse<>(planService.create(user, planDto), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "일정 전체 조회", notes = "사용자의 전체 일정 조회")
@@ -68,7 +64,7 @@ public class PlanController {
             @ApiResponse(code = 400, message = "일정 수정 실패")
     })
     public ImgoingResponse<PlanDto> update (User user, @RequestBody @Valid PlanDto planDto) {
-        return new ImgoingResponse<>(planMapper.toDto(planService.update(planDto)));
+        return new ImgoingResponse<>(planMapper.toDto(planService.update(user.getId(), planDto)));
     }
 
     @ApiOperation(value = "일정 삭제")
@@ -79,7 +75,7 @@ public class PlanController {
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long id
     ) {
-        planService.delete(planService.getPlanById(id));
+        planService.delete(user.getId(), planService.getPlanById(id));
         String responseMessage = "id = " + id + "일정이 삭제되었습니다.";
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
