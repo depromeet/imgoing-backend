@@ -22,13 +22,13 @@ public class Plantask extends BaseTime {
     private Long id;
 
     @JsonBackReference
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "planId", referencedColumnName = "id")
     private Plan plan;
 
-    @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "taskId", referencedColumnName = "id")
-    private List<Task> taskList = new ArrayList<>();
+    private Task task;
 
     public void modifyPlantask(List<Task> taskList) {
         this.taskList = taskList;
