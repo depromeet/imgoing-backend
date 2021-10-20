@@ -13,16 +13,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-<<<<<<< HEAD:src/main/java/org/imgoing/api/dto/PresetDto.java
-public class PresetDto {
-    @ApiModelProperty(value = "프리셋 id")
-    private Long id;
-
-    @ApiModelProperty(value = "프리셋 이름")
-=======
 public class RoutineDto {
     @ApiModelProperty(value = "루틴 이름")
->>>>>>> 94c44d1 (Fix : 루틴 생성 및 조회 Dto 분리, 속성명 변경):src/main/java/org/imgoing/api/dto/RoutineDto.java
     private String name;
 
     @SuperBuilder

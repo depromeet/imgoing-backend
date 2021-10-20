@@ -16,6 +16,9 @@ import java.util.List;
 public interface RoutineMapper {
     Routine toEntityForPut(RoutineDto.Update dto);
 
+    @Mapping(target = "id", ignore = true)
+    Routine toEntityForPost(RoutineDto.Create dto);
+
     RoutineDto.Read toDto(Routine routine, List<Task> tasks);
 
     RoutineDto.Read toDto(Routine routine);
