@@ -13,6 +13,7 @@ import org.imgoing.api.domain.entity.Task;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @SuperBuilder
@@ -32,11 +33,11 @@ public class PlanDto {
     @ApiModelProperty(required = true, value = "출발 장소 이름", example = "서울대입구역 9번 출구")
     private String departureName;
 
-    @NotBlank(message = "출발 위도는 필수값 입니다.")
+    @NotNull(message = "출발 위도는 필수값 입니다.")
     @ApiModelProperty(required = true, value = "출발 장소 위도", example = "37.481254")
     private Double departureLat;
 
-    @NotBlank(message = "출발 경도는 필수값 입니다.")
+    @NotNull(message = "출발 경도는 필수값 입니다.")
     @ApiModelProperty(required = true, value = "출발 장소 경도", example = "126.953228")
     private Double departureLng;
 
@@ -64,7 +65,7 @@ public class PlanDto {
     private String belongings;
 
     @ApiModelProperty(value = "준비항목")
-    private List<Task> tasks;
+    private List<TaskDto> taskDtos;
 
     public void update(Plan plan) {
         plan.setName(this.name);
