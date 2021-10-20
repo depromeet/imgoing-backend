@@ -31,8 +31,8 @@ public class Routine extends BaseTime {
         this.name = newRoutine.getName();
     }
 
-    public void setRoutinetasks(List<Task> tasks) {
-        this.routinetasks = tasks.stream()
+    public List<Routinetask> makeRoutinetasks(List<Task> tasks) {
+        return tasks.stream()
                 .map(task -> Routinetask.builder()
                         .routine(this)
                         .task(task)
@@ -40,7 +40,7 @@ public class Routine extends BaseTime {
                 .collect(Collectors.toList());
     }
 
-    public List<Task> getTaskList() {
+    public List<Task> getTasks() {
         return routinetasks.stream().map(Routinetask::getTask).collect(Collectors.toList());
     }
 }
