@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @ApiModel(value = "악속 정보", description = "약속 모델")
 public class PlanDto {
-    @ApiModelProperty(value = "일정 id", hidden = true)
+    @ApiModelProperty(value = "일정 id")
     private Long id;
 
     @NotBlank(message = "일정 이름은 필수값 입니다.")

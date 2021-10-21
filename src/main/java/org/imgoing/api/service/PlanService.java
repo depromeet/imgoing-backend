@@ -27,11 +27,11 @@ public class PlanService {
     private final TaskMapper taskMapper;
 
     @Transactional
-    public PlanDto create(User user, PlanDto planDto) {
+    public PlanDto createPlan(User user, PlanDto planDto) {
         Plan plan = planMapper.toEntity(planDto);
         plan.addUser(user);
 
-        long planId = planRepository.save(plan).getId();
+        plan = planRepository.save(plan);
 
         List<TaskDto> taskDtos = planDto.getTaskDtos();
 
@@ -51,18 +51,64 @@ public class PlanService {
             }
         }
 
-        // 새로운 task일 경우 -> task table에 먼저 저장
+        // 새로운 task일 경우: task table에 먼저 저장
         // newTasks = taskService.saveTasks(user, newTasks);
 
-        // plantask db 저장
+        // plantask db 저장 TODO
         newTasks.addAll(bookmarkedTasks);
-        // plantaskService.savePlanTasks(planId, newTasks);
+        // plantaskService.savePlanTasks(plan.getid(), newTasks);
 
-        taskDtos = newTasks.stream()
-                .map(taskMapper::toDto)
+        return planMapper.toDto(plan, getTaskDtoList(plan));
+    }
+
+    @Transactional(readOnly = true)
+    public List<PlanDto> getPlans(Long userId) {
+        List<Plan> plans =  planRepository.findAll();
+
+        return plans.stream()
+                .map(plan -> planMapper.toDto(plan, getTaskDtoList(plan)))
                 .collect(Collectors.toList());
+    }
 
-        return planMapper.toDto(plan, taskDtos); // TODO: task id생성된 dto랑 plan dto랑 합쳐서 넘기기
+    @Transactional(readOnly = true)
+    public PlanDto getPlan(Long userId, Long planId) {
+        Plan plan = getPlanById(planId);
+        validateAuthorizedUser(userId, plan);
+
+        return planMapper.toDto(plan, getTaskDtoList(plan));
+    }
+
+    @Transactional
+    public PlanDto updatePlan(Long userId, PlanDto planDto) {
+        Plan plan = getPlanById(planDto.getId());
+        validateAuthorizedUser(userId, plan);
+
+        // plan update
+        planDto.update(plan);
+
+        // update된 plan save
+        plan = planRepository.save(plan);
+
+        // task update
+        // taskService.update(planDto.getTasks());
+
+        // plantask update TODO
+
+        return planMapper.toDto(plan, getTaskDtoList(plan));
+    }
+
+    @Transactional
+    public void deletePlan(Long userId, Long planId) {
+        Plan plan = getPlanById(planId);
+        validateAuthorizedUser(userId, plan);
+        
+        // task 삭제
+        // taskService.delete(plan.getId());
+
+        // plantask 삭제 TODO -> plan id 해당하는거 다 지우면 됨
+        // plantaskService.delete(plan.getId());
+
+        planRepository.delete(plan);
     }
 
     @Transactional(readOnly = true)
@@ -70,47 +116,13 @@ public class PlanService {
         return planRepository.findById(id)
                 .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 일정입니다."));
     }
-
+    
+    // plan에 속한 task를 모두 가져오는 함수
     @Transactional(readOnly = true)
-    public List<Plan> getPlanByUserId(Long userId) {
-        List<Plan> plans =  planRepository.findAll();
-
-        // TODO task 붙여주기
-        for (Plan plan : plans) {
-            List<Plantask> plantasks = plan.getPlantasks();
-            for (Plantask plantask : plantasks) {
-                plantask.getTask();
-            }
-        }
-        return planRepository.findAll();
-    }
-
-    @Transactional
-    public Plan update(Long userId, PlanDto planDto) {
-        Plan plan = getPlanById(planDto.getId());
-        validateAuthorizedUser(userId, plan);
-
-        // plan update
-        planDto.update(plan);
-
-        // task update
-        // taskService.update(planDto.getTasks());
-
-        // TODO task 붙여서 return
-        return  planRepository.save(plan);
-    }
-
-    @Transactional
-    public void delete(Long userId, Plan plan) {
-        validateAuthorizedUser(userId, plan);
-        
-        // task 삭제
-        // taskService.delete(plan.getId());
-
-        // plantask 삭제
-        // plantaskService.delete(plan.getId());
-
-        planRepository.delete(plan);
+    public List<TaskDto> getTaskDtoList(Plan plan) {
+        return plan.getPlantasks().stream()
+                .map(plantask -> taskMapper.toDto(plantask.getTask()))
+                .collect(Collectors.toList());
     }
 
     // plan의 작성자와 현재 로그인한 사용자가 일치하는지 확인하는 함수

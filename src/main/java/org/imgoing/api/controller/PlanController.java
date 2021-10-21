@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/plans")
 public class PlanController {
     private final PlanService planService;
-    private final TaskService taskService;
-    private final PlanMapper planMapper;
 
     @ApiOperation(value = "일정 생성")
     @PostMapping
@@ -32,17 +30,14 @@ public class PlanController {
             @ApiResponse(code = 400, message = "일정 생성 실패")
     })
     public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanDto planDto) {
-        return new ImgoingResponse<>(planService.create(user, planDto), HttpStatus.CREATED);
+        return new ImgoingResponse<>(planService.createPlan(user, planDto), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "일정 전체 조회", notes = "사용자의 전체 일정 조회")
     @GetMapping
     @ApiResponse(code = 200, message = "일정 전체 조회 성공", response = List.class)
     public ImgoingResponse<List<PlanDto>> getAllPlans(User user) {
-        List<PlanDto> planDtoList = planService.getPlanByUserId(user.getId()).stream()
-                .map(planMapper::toDto)
-                .collect(Collectors.toList());
-        return new ImgoingResponse<>(planDtoList);
+        return new ImgoingResponse<>(planService.getPlans(user.getId()));
     }
 
     @ApiOperation(value = "일정 조회", notes = "사용자의 특정 일정 조회")
@@ -51,10 +46,9 @@ public class PlanController {
     public ImgoingResponse<PlanDto> getPlan(
             User user,
             @ApiParam(value = "일정 id", required = true, example = "1")
-            @PathVariable(value = "planId") Long id
+            @PathVariable(value = "planId") Long planId
     ) {
-        Plan plan = planService.getPlanById(id);
-        return new ImgoingResponse<>(planMapper.toDto(plan));
+        return new ImgoingResponse<>(planService.getPlan(user.getId(), planId));
     }
 
     @ApiOperation(value = "일정 수정")
@@ -64,7 +58,7 @@ public class PlanController {
             @ApiResponse(code = 400, message = "일정 수정 실패")
     })
     public ImgoingResponse<PlanDto> update (User user, @RequestBody @Valid PlanDto planDto) {
-        return new ImgoingResponse<>(planMapper.toDto(planService.update(user.getId(), planDto)));
+        return new ImgoingResponse<>(planService.updatePlan(user.getId(), planDto));
     }
 
     @ApiOperation(value = "일정 삭제")
@@ -73,10 +67,10 @@ public class PlanController {
     public ImgoingResponse<String> delete(
             User user,
             @ApiParam(value = "일정 id", required = true, example = "1")
-            @PathVariable(value = "planId") Long id
+            @PathVariable(value = "planId") Long planId
     ) {
-        planService.delete(user.getId(), planService.getPlanById(id));
-        String responseMessage = "id = " + id + "일정이 삭제되었습니다.";
+        planService.deletePlan(user.getId(), planId);
+        String responseMessage = "planId = " + planId + "일정이 삭제되었습니다.";
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
 }
