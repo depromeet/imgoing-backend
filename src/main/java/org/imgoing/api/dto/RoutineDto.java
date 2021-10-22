@@ -37,7 +37,7 @@ public class RoutineDto {
         private Long id;
 
         @ApiModelProperty(value = "준비항목 목록")
-        private List<TaskDto> tasks;
+        private List<RoutinetaskDto.Read> routinetasks;
     }
 
     @SuperBuilder

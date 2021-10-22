@@ -5,8 +5,8 @@ import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -31,16 +31,20 @@ public class Routine extends BaseTime {
         this.name = newRoutine.getName();
     }
 
-    public List<Routinetask> makeRoutinetasks(List<Task> tasks) {
-        return tasks.stream()
-                .map(task -> Routinetask.builder()
-                        .routine(this)
-                        .task(task)
-                        .build())
-                .collect(Collectors.toList());
+    public List<Routinetask> getRoutinetasks() {
+        Collections.sort(routinetasks);
+        return routinetasks;
     }
 
-    public List<Task> getTasks() {
-        return routinetasks.stream().map(Routinetask::getTask).collect(Collectors.toList());
+    public List<Routinetask> makeRoutinetasks(List<Task> tasks) {
+        List<Routinetask> rt = new ArrayList<>();
+        for(int i = 0; i < tasks.size(); ++i) {
+            rt.add(Routinetask.builder()
+                    .routine(this)
+                    .task(tasks.get(i))
+                    .priority(i)
+                    .build());
+        }
+        return rt;
     }
 }
