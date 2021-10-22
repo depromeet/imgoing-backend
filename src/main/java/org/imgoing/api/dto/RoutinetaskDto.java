@@ -1,6 +1,7 @@
 package org.imgoing.api.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,9 +12,14 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 public class RoutinetaskDto {
-    @ApiModelProperty(value = "루틴 Id")
-    private Long routineId;
-    @ApiModelProperty(value = "준비항목 Id")
-    private Long taskId;
+    @SuperBuilder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Read {
+        @ApiModelProperty(value = "준비항목 모델")
+        private TaskDto task;
+    }
 }
 
