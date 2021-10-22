@@ -1,5 +1,6 @@
 package org.imgoing.api.mapper;
 
+import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.dto.PlantaskDto;
 import org.imgoing.api.domain.entity.Plantask;
 import org.imgoing.api.domain.entity.Task;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        uses = { PresetMapper.class, TaskMapper.class })
+        uses = { RoutineMapper.class, TaskMapper.class })
 
 public interface PlantaskMapper {
     PlantaskDto.Read toDto(Plantask plantask);

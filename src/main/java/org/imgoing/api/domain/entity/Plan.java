@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -55,10 +56,23 @@ public class Plan extends BaseTime {
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
 
-    @OneToMany(mappedBy = "plan", fetch = FetchType.EAGER)
-    private List<Plantask> plantasks;
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    private List<Plantask> plantasks = new ArrayList<>();
 
     public void addUser(User user) {
         this.user = user;
+    }
+
+    public void setPlantask(List<Task> tasks) {
+        this.plantasks = tasks.stream()
+                .map(task -> Plantask.builder()
+                .plan(this)
+                .task(task)
+                .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<Task> getTaskList() {
+        return plantasks.stream().map(Plantask::getTask).collect(Collectors.toList());
     }
 }

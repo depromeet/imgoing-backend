@@ -2,6 +2,7 @@ package org.imgoing.api.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -65,7 +66,7 @@ public class PlanDto {
     private String belongings;
 
     @ApiModelProperty(value = "준비항목")
-    private List<TaskDto> taskDtos;
+    private List<TaskDto> task;
 
     public void update(Plan plan) {
         plan.setName(this.name);

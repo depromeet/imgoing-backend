@@ -2,11 +2,14 @@ package org.imgoing.api.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -21,7 +24,6 @@ public class Plantask extends BaseTime {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "planId", referencedColumnName = "id")
     private Plan plan;
@@ -30,7 +32,8 @@ public class Plantask extends BaseTime {
     @JoinColumn(name = "taskId", referencedColumnName = "id")
     private Task task;
 
-    public void modifyPlantask(List<Task> taskList) {
-        this.taskList = taskList;
+    public void setPlanTask(Plan plan, Task task) {
+        this.plan = plan;
+        this.task = task;
     }
 }
