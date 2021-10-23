@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class RouteSearchRequestDto {
+public class RouteSearchRequest {
     private final double startLng;
     private final double startLat;
     private final double endLng;

@@ -1,50 +1,44 @@
 package org.imgoing.api.domain.entity;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NoArgsConstructor;
-import org.imgoing.api.dto.route.OdsayRouteSearchRequestDto;
-import org.imgoing.api.dto.route.OdsayRouteSearchResponseDto;
-import org.imgoing.api.dto.route.RouteSearchRequestDto;
+import lombok.extern.slf4j.Slf4j;
+import org.imgoing.api.dto.route.OdsayRouteSearchResponse;
+import org.imgoing.api.dto.route.RouteSearchRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Map;
+import java.net.URI;
 
+@Slf4j
 @NoArgsConstructor
 @Component
 public class RouteSearcher {
-    private static final ObjectMapper mapper = new ObjectMapper();
     private static final RestTemplate routeSearchClient = new RestTemplate();
     private static final String url = "https://api.odsay.com/v1/api/searchPubTransPathT";
 
     @Value("${keys.odsayApiKey}")
     private String apiKey;
 
-    private OdsayRouteSearchResponseDto searchAllRoutes(RouteSearchRequestDto requestDto) {
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url);
-        MultiValueMap params = new LinkedMultiValueMap<>();
-        params.setAll(mapper.convertValue(
-                new OdsayRouteSearchRequestDto(
-                        apiKey,
-                        requestDto.getStartLng(),
-                        requestDto.getStartLat(),
-                        requestDto.getEndLng(),
-                        requestDto.getEndLat(),
-                        requestDto.getSortCriterion()
-                ), Map.class));
-        uriComponentsBuilder.queryParams(params);
-        OdsayRouteSearchResponseDto response = routeSearchClient.getForObject(
-                uriComponentsBuilder.build().toUri(),
-                OdsayRouteSearchResponseDto.class);
-        return response;
+    private OdsayRouteSearchResponse searchAllRoutes(RouteSearchRequest requestDto) {
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("apiKey", apiKey)
+                .queryParam("SX", requestDto.getStartLng())
+                .queryParam("SY", requestDto.getStartLat())
+                .queryParam("EX", requestDto.getEndLng())
+                .queryParam("EY", requestDto.getEndLat())
+                .queryParam("OPT", requestDto.getSortCriterion());
+        ResponseEntity<OdsayRouteSearchResponse> response = routeSearchClient.getForEntity(
+                URI.create(uriComponentsBuilder.build().toUriString()),
+                OdsayRouteSearchResponse.class);
+        log.info("statusCode: {}", response.getStatusCode());
+        return response.getBody();
     }
 
-    public double calcRouteAverageTime(RouteSearchRequestDto requestDto) {
-        OdsayRouteSearchResponseDto routeSearchResponseDto = this.searchAllRoutes(requestDto);
+    public double calcRouteAverageTime(RouteSearchRequest requestDto) {
+        OdsayRouteSearchResponse routeSearchResponseDto = this.searchAllRoutes(requestDto);
         return routeSearchResponseDto.getResult().getPath().stream()
                 .mapToDouble(path -> path.getInfo().getTotalTime())
                 .limit(5)

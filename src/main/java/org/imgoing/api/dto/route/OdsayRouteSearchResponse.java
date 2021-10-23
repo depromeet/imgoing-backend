@@ -2,14 +2,17 @@ package org.imgoing.api.dto.route;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class OdsayRouteSearchResponseDto {
+public class OdsayRouteSearchResponse {
     private Result result;
 
+    @NoArgsConstructor
     @AllArgsConstructor
     @Getter
     public static class Result {
@@ -23,6 +26,7 @@ public class OdsayRouteSearchResponseDto {
         private int endRadius;
         private List<Path> path;
 
+        @NoArgsConstructor
         @AllArgsConstructor
         @Getter
         public static class Path {
@@ -30,6 +34,7 @@ public class OdsayRouteSearchResponseDto {
             private Info info;
             private List<SubPath> subPath;
 
+            @NoArgsConstructor
             @AllArgsConstructor
             @Getter
             public static class Info {
@@ -49,6 +54,7 @@ public class OdsayRouteSearchResponseDto {
                 private int totalWalkTime;
             }
 
+            @NoArgsConstructor
             @AllArgsConstructor
             @Getter
             public static class SubPath {
@@ -76,6 +82,7 @@ public class OdsayRouteSearchResponseDto {
                 private double endExitY;
                 private PassStopList passStopList;
 
+                @NoArgsConstructor
                 @AllArgsConstructor
                 @Getter
                 public static class Lane {
@@ -87,11 +94,13 @@ public class OdsayRouteSearchResponseDto {
                     private int busID;
                 }
 
+                @NoArgsConstructor
                 @AllArgsConstructor
                 @Getter
                 public static class PassStopList {
                     private List<Station> stations;
 
+                    @NoArgsConstructor
                     @AllArgsConstructor
                     @Getter
                     public static class Station {
