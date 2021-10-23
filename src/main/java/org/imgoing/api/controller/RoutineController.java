@@ -28,21 +28,17 @@ public class RoutineController {
     private final RoutineService routineService;
     private final TaskService taskService;
     private final RoutinetaskService routinetaskService;
+
     private final RoutineMapper routineMapper;
 
     @ApiOperation(value = "루틴 생성")
     @PostMapping
     public ImgoingResponse<RoutineDto.Read> create(User user, @RequestBody RoutineDto.Create dto) {
         Routine newRoutine = routineService.create(routineMapper.toEntityForPost(dto));
+        List<Task> tasks = taskService.getListById(dto.getTaskIdList());
+        List<Routinetask> newRoutinetasks = routinetaskService.createAll(newRoutine.makeRoutinetasks(tasks));
 
-        List<Task> tasks = dto.getTaskIdList().stream()
-                .map(taskService::getById)
-                .collect(Collectors.toList());
-
-        newRoutine.setRoutinetasks(newRoutine.makeRoutinetasks(tasks));
-        routinetaskService.saveAll(newRoutine.getRoutinetasks());
-
-        RoutineDto.Read result = routineMapper.toDto(newRoutine, newRoutine.getRoutinetasks());
+        RoutineDto.Read result = routineMapper.toDto(newRoutine, newRoutinetasks);
         return new ImgoingResponse<>(result, HttpStatus.CREATED);
     }
 
@@ -85,49 +81,10 @@ public class RoutineController {
     @PutMapping
     public ImgoingResponse<RoutineDto.Read> update(User user, @RequestBody RoutineDto.Update dto){
         routineService.update(routineMapper.toEntityForPut(dto));
-
         Routine routine = routineService.getById(dto.getId());
-        List<Long> updateIdList = dto.getTaskIdList();
+        List<Routinetask> routinetasks = routinetaskService.update(routine, dto.getTaskIdList());
 
-        List<Routinetask> routinetasks = routine.getRoutinetasks();
-
-        List<Routinetask> removeList = routinetasks.stream()
-                .filter(routinetask -> !updateIdList.contains(routinetask.getTask().getId()))
-                .collect(Collectors.toList());
-
-        routinetasks.removeAll(removeList);
-        routinetaskService.deleteAll(removeList);
-
-        List<Long> remainIdList = routinetasks.stream()
-                .map(routinetask -> routinetask.getTask().getId())
-                .collect(Collectors.toList());
-
-        List<Routinetask> updateList = updateIdList.stream()
-                .filter(taskId -> !remainIdList.contains(taskId))
-                .map(taskId -> Routinetask.builder()
-                        .routine(routine)
-                        .task(taskService.getById(taskId))
-                        .build())
-                .collect(Collectors.toList());
-
-        updateList.addAll(routinetasks);
-        routinetasks.clear();
-
-        for(int i = 0; i < updateIdList.size(); ++i) {
-            for(Routinetask rt : updateList) {
-                if(updateIdList.get(i).equals(rt.getTask().getId())) {
-                    rt.setPriority(i);
-                    routinetasks.add(rt);
-                    updateList.remove(rt);
-                    break;
-                }
-            }
-        }
-
-        routine.setRoutinetasks(routinetasks);
-        routinetaskService.saveAll(routinetasks);
-
-        RoutineDto.Read result = routineMapper.toDto(routine, routine.getRoutinetasks());
+        RoutineDto.Read result = routineMapper.toDto(routine, routinetasks);
         return new ImgoingResponse<>(result, HttpStatus.CREATED);
     }
 }

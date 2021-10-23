@@ -19,6 +19,7 @@ public interface RoutineMapper {
     @Mapping(target = "id", ignore = true)
     Routine toEntityForPost(RoutineDto.Create dto);
 
+    @Mapping(target = "routinetasks", source = "routinetasks")
     RoutineDto.Read toDto(Routine routine, List<Routinetask> routinetasks);
 
     RoutineDto.Read toDto(Routine routine);

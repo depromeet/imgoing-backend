@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "routine_tb")
 @Builder
@@ -32,7 +31,7 @@ public class Routine extends BaseTime {
     }
 
     public List<Routinetask> getRoutinetasks() {
-        Collections.sort(routinetasks);
+        if(routinetasks != null) Collections.sort(routinetasks);
         return routinetasks;
     }
 
