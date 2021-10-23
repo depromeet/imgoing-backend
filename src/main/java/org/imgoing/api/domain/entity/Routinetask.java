@@ -8,7 +8,6 @@ import org.imgoing.api.config.BaseTime;
 import javax.persistence.*;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "routinetask_tb")
 @Builder
@@ -36,5 +35,9 @@ public class Routinetask extends BaseTime implements Comparable {
     public int compareTo(Object o) {
         Routinetask routinetask = (Routinetask)o;
         return this.priority - routinetask.priority;
+    }
+
+    public void addPriority(Integer priority) {
+        this.priority = priority;
     }
 }

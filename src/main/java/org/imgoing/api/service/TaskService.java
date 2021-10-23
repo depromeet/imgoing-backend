@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,13 @@ public class TaskService {
     public Task getById(Long id){
         return taskRepository.findById(id)
                 .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 준비항목입니다."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Task> getListById(List<Long> idList){
+        return idList.stream()
+                .map(this::getById)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
