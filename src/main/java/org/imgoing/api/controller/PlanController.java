@@ -5,14 +5,17 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.User;
+import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
 import org.imgoing.api.dto.PlanDto;
 import org.imgoing.api.domain.entity.Plan;
+import org.imgoing.api.dto.route.RemainingTimeResponse;
 import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.service.PlanService;
 import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +31,7 @@ public class PlanController {
     @PostMapping
     public ImgoingResponse<PlanDto> create(User user, @RequestBody PlanDto planDto) {
         Plan newPlan = planMapper.toEntity(planDto);
-        Plan savedPlan = planService.create(newPlan);
+        Plan savedPlan = planService.create(user, newPlan);
         return new ImgoingResponse<>(planMapper.toDto(savedPlan), HttpStatus.CREATED);
     }
 
@@ -62,5 +65,12 @@ public class PlanController {
         planService.delete(planService.getPlanById(id));
         String responseMessage = "id = " + id + "일정이 삭제되었습니다.";
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
+    }
+
+    @ApiOperation(value = "가장 최근 약속까지 남은 시간")
+    @GetMapping("/remaining/time")
+    public ImgoingResponse<RemainingTimeResponse> getRemainingTime (User user) {
+        RemainingTimeInfoVo remainingTimeInfoVo = planService.getTimeRemainingUntilRecentPlan(user);
+        return new ImgoingResponse<>(new RemainingTimeResponse(remainingTimeInfoVo));
     }
 }
