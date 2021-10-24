@@ -34,7 +34,7 @@ public class RoutineController {
     @ApiOperation(value = "루틴 생성")
     @PostMapping
     public ImgoingResponse<RoutineDto.Read> create(User user, @RequestBody RoutineDto.Create dto) {
-        Routine newRoutine = routineService.create(routineMapper.toEntityForPost(dto));
+        Routine newRoutine = routineService.create(routineMapper.toEntityForPost(user, dto));
         List<Task> tasks = taskService.getListById(dto.getTaskIdList());
         List<Routinetask> newRoutinetasks = routinetaskService.createAll(newRoutine.makeRoutinetasks(tasks));
 
@@ -80,7 +80,7 @@ public class RoutineController {
     @ApiOperation(value = "루틴 수정")
     @PutMapping
     public ImgoingResponse<RoutineDto.Read> update(User user, @RequestBody RoutineDto.Update dto){
-        routineService.update(routineMapper.toEntityForPut(dto));
+        routineService.update(routineMapper.toEntityForPut(user, dto));
         Routine routine = routineService.getById(dto.getId());
         List<Routinetask> routinetasks = routinetaskService.update(routine, dto.getTaskIdList());
 
