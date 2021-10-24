@@ -45,7 +45,7 @@ public class RoutineController {
     @ApiOperation(value = "루틴 전체 조회")
     @GetMapping
     public ImgoingResponse<List<RoutineDto.Read>> getAll(User user) {
-        List<RoutineDto.Read> result = routineService.getAll().stream()
+        List<RoutineDto.Read> result = routineService.getListByUserId(user.getId()).stream()
                 .map(routine -> routineMapper.toDto(routine, routine.getRoutinetasks()))
                 .collect(Collectors.toList());
         return new ImgoingResponse<>(result, HttpStatus.OK);
