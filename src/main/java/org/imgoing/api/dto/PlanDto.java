@@ -9,12 +9,10 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.Length;
 import org.imgoing.api.domain.entity.Plan;
-import org.imgoing.api.domain.entity.Task;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @SuperBuilder
@@ -67,14 +65,4 @@ public class PlanDto {
 
     @ApiModelProperty(value = "준비항목")
     private List<TaskDto> task;
-
-    public void update(Plan plan) {
-        plan.setName(this.name);
-        plan.setArrivalName(this.arrivalName);
-        plan.setArrivalLat(this.arrivalLat);
-        plan.setArrivalLng(this.arrivalLng);
-        plan.setArrivalAt(this.arrivalAt);
-        plan.setMemo(this.memo);
-        plan.setBelongings(this.belongings);
-    }
 }
