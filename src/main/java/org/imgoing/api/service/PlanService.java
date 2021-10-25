@@ -8,6 +8,10 @@ import org.imgoing.api.dto.PlanDto;
 import org.imgoing.api.dto.TaskDto;
 import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.mapper.TaskMapper;
+import org.imgoing.api.domain.entity.RouteSearcher;
+import org.imgoing.api.domain.entity.User;
+import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
+import org.imgoing.api.dto.route.RouteSearchRequest;
 import org.imgoing.api.repository.PlanRepository;
 import org.imgoing.api.support.ImgoingError;
 import org.imgoing.api.support.ImgoingException;
@@ -15,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +32,7 @@ public class PlanService {
     private final PlantaskService plantaskService;
     private final PlanMapper planMapper;
     private final TaskMapper taskMapper;
+    private final RouteSearcher routeSearcher;
 
     @Transactional
     public Plan createPlan(User user, PlanDto planDto) {
@@ -156,5 +163,27 @@ public class PlanService {
                 .filter(taskDto -> taskDto.getIsBookmarked())
                 .map(taskMapper::toEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public RemainingTimeInfoVo getTimeRemainingUntilRecentPlan (User user) {
+        LocalDateTime now = LocalDateTime.now();
+        Plan recentPlan = planRepository.findTopByUserAndArrivalAtGreaterThanOrderByArrivalAtAsc(user, now)
+                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "시간을 계산할 수 있는 Plan이 없습니다."));
+        // TODO: Hardcoding된 Lat, Lng 인풋으로 받기
+        double startLng = 126.9027279;
+        double startLat = 37.5349277;
+        RouteSearchRequest requestDto = new RouteSearchRequest(
+                startLng,
+                startLat,
+                recentPlan.getArrivalLng(),
+                recentPlan.getArrivalLat(),
+                0
+        );
+        int routeAverageMins = (int) Math.ceil(routeSearcher.calcRouteAverageTime(requestDto));
+        LocalDateTime recentPlanArrivalAt = recentPlan.getArrivalAt();
+        // TODO: PlanTask들의 준비시간 합해서 계산해서 minus 해주기
+        Duration remainingTime = Duration.between(now, recentPlanArrivalAt.minusMinutes(routeAverageMins));
+        return new RemainingTimeInfoVo(remainingTime, routeAverageMins, 0, recentPlanArrivalAt);
     }
 }
