@@ -38,7 +38,7 @@ public class PlantaskService {
     @Transactional(readOnly = true)
     public Plantask getById(Long id){
         return plantaskRepository.findById(id)
-                .orElseThrow(() -> new ImgoingException(ImgoingError.ROUTINE_NOT_EXIST));
+                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 루틴입니다."));
     }
 
     @Transactional(readOnly = true)

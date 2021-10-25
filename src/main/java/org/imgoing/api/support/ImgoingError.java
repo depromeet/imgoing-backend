@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ImgoingError {
-    ROUTINE_NOT_EXIST("존재하지 않는 루틴입니다.", HttpStatus.NOT_FOUND),
     UNKNOWN_ERROR("알 수 없는 에러입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     NOT_LOGIN("비 로그인 사용자입니다.", HttpStatus.UNAUTHORIZED),
     BAD_REQUEST("사용자의 입력이 잘못되었습니다.", HttpStatus.BAD_REQUEST),

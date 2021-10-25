@@ -13,6 +13,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RoutineService {
+    private final TaskService taskService;
     private final RoutineRepository routineRepository;
 
     @Transactional

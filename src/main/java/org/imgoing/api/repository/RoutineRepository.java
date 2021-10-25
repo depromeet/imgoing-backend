@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface RoutineRepository extends JpaRepository<Routine, Long> {
-    @Query(value = "SELECT * FROM routine_tb WHERE routine_tb.user_id = :userId", nativeQuery = true)
+    @Query("SELECT r FROM Routine r WHERE r.user.id = :userId")
     List<Routine> findAllByUserId(Long userId);
 }
