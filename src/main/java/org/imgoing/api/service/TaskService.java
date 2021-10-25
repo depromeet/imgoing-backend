@@ -49,4 +49,15 @@ public class TaskService {
         oldTask.modifyTask(newTask);
         return taskRepository.save(oldTask);
     }
+
+    @Transactional
+    public List<Task> saveAll(List<Task> tasks) {
+        return taskRepository.saveAll(tasks);
+    }
+
+    @Transactional
+    public void deleteAll(List<Task> tasks) {
+        taskRepository.deleteAll(tasks);
+    }
+
 }
