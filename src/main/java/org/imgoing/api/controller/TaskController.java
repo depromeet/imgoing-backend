@@ -4,9 +4,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.TaskDto;
-import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.mapper.TaskMapper;
 import org.imgoing.api.service.TaskService;
 import org.imgoing.api.support.ImgoingResponse;
@@ -26,7 +26,7 @@ public class TaskController {
 
     @ApiOperation(value = "준비항목 생성")
     @PostMapping
-    public ImgoingResponse<TaskDto> create(
+    public ImgoingResponse<TaskDto.Read> create(
             User user,
             @RequestBody TaskDto dto
     ) {
@@ -37,7 +37,7 @@ public class TaskController {
 
     @ApiOperation(value = "준비항목 조회")
     @GetMapping("/{taskId}")
-    public ImgoingResponse<TaskDto> get(
+    public ImgoingResponse<TaskDto.Read> get(
             User user,
             @ApiParam(value = "준비항목 id", required = true, example = "1")
             @PathVariable(value = "taskId") Long id
@@ -46,22 +46,10 @@ public class TaskController {
         return new ImgoingResponse<>(taskMapper.toDto(foundTask));
     }
 
-//    @ApiOperation(value = "준비항목 리스트 조회")
-//    @GetMapping("/{userId}")
-//    public ImgoingResponse<List<TaskDto>> getList(
-//            @ApiParam(value = "회원 id", required = true, example = "1")
-//            @PathVariable(value = "userId") Long userId
-//    ) {
-//        List<TaskDto> taskDtoList = taskService.getListByUserId(userId).stream()
-//                .map(taskMapper::toDto)
-//                .collect(Collectors.toList());
-//        return new ImgoingResponse<>(taskDtoList);
-//    }
-
     @ApiOperation(value = "준비항목 리스트 전체 조회")
-    @GetMapping("/all")
-    public ImgoingResponse<List<TaskDto>> getListAll(){
-        List<TaskDto> taskDtoList = taskService.getListAll().stream()
+    @GetMapping
+    public ImgoingResponse<List<TaskDto.Read>> getListAll(){
+        List<TaskDto.Read> taskDtoList = taskService.getListAll().stream()
                 .map(taskMapper::toDto)
                 .collect(Collectors.toList());
         return new ImgoingResponse<>(taskDtoList);
@@ -83,9 +71,9 @@ public class TaskController {
 
     @ApiOperation(value = "준비항목 수정")
     @PutMapping
-    public ImgoingResponse<TaskDto> update (User user, @RequestBody TaskDto dto){
+    public ImgoingResponse<TaskDto.Read> update (User user, @RequestBody TaskDto.Update dto){
         Task willUpdateTask = taskMapper.toEntity(dto);
-        TaskDto taskDto = taskMapper.toDto(taskService.update(willUpdateTask));
-        return new ImgoingResponse<>(taskDto);
+        TaskDto.Read taskDto = taskMapper.toDto(taskService.update(willUpdateTask));
+        return new ImgoingResponse<>(taskDto, HttpStatus.CREATED);
     }
 }
