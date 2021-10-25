@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,22 @@ public class TaskService {
     @Transactional(readOnly = true)
     public Task getById(Long id){
         return taskRepository.findById(id)
-                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 세부업무입니다."));
+                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 준비항목입니다."));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Task> getListById(List<Long> idList){
+        return idList.stream()
+                .map(this::getById)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Task getBookmarkById(Long id){
+        Task task =  taskRepository.findById(id)
+                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 준비항목입니다."));
+        if(!task.getIsBookmarked()) throw new ImgoingException(ImgoingError.BAD_REQUEST, "북마크 되지 않은 준비항목은 루틴에 추가할 수 없습니다.");
+        else return task;
     }
 
     @Transactional(readOnly = true)
