@@ -56,23 +56,38 @@ public class Plan extends BaseTime {
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
 
-    @OneToMany(mappedBy = "plan", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "plan", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Plantask> plantasks = new ArrayList<>();
 
     public void addUser(User user) {
         this.user = user;
     }
 
-    public void setPlantask(List<Task> tasks) {
-        this.plantasks = tasks.stream()
+    public void registerPlantask(List<Task> tasks) {
+        this.plantasks.clear();
+        List<Plantask> plantasks = tasks.stream()
                 .map(task -> Plantask.builder()
                 .plan(this)
                 .task(task)
                 .build())
                 .collect(Collectors.toList());
+        this.plantasks.addAll(plantasks);
     }
 
     public List<Task> getTaskList() {
         return plantasks.stream().map(Plantask::getTask).collect(Collectors.toList());
+    }
+
+    public void updatePlan(Plan newPlan) {
+        this.name = newPlan.getName();
+        this.departureName = newPlan.getDepartureName();
+        this.departureLat = newPlan.getDepartureLat();
+        this.departureLng = newPlan.getDepartureLng();
+        this.arrivalName = newPlan.getArrivalName();
+        this.arrivalLat = newPlan.getArrivalLat();
+        this.arrivalLng = newPlan.getArrivalLng();
+        this.arrivalAt = newPlan.getArrivalAt();
+        this.memo = newPlan.getMemo();
+        this.belongings = newPlan.getBelongings();
     }
 }
