@@ -1,9 +1,9 @@
 package org.imgoing.api.mapper;
 
 import org.imgoing.api.domain.entity.Task;
+import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.PlanDto;
 import org.imgoing.api.domain.entity.Plan;
-import org.imgoing.api.dto.TaskDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -17,4 +17,8 @@ public interface PlanMapper {
     PlanDto toDto(Plan plan, List<Task> tasks);
 
     Plan toEntity(PlanDto planDto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "user", source = "user")
+    Plan toEntityForSave(User user, PlanDto.Create dto);
 }

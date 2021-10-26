@@ -20,7 +20,7 @@ public class TaskDto {
     @ApiModelProperty(value = "준비항목 시간")
     private Integer time;
 
-    @ApiModelProperty(value = "북마크 여부")
+    @ApiModelProperty(value = "북마크 여부", example = "false")
     private Boolean isBookmarked;
 
     @SuperBuilder

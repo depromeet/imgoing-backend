@@ -32,8 +32,8 @@ public class PlanController {
             @ApiResponse(code = 201, message = "일정 생성 성공", response = PlanDto.class),
             @ApiResponse(code = 400, message = "일정 생성 실패")
     })
-    public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanDto planDto) {
-        Plan plan = planService.createPlan(user, planDto);
+    public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanDto.Create planSaveRequest) {
+        Plan plan = planService.createPlan(user, planSaveRequest);
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()), HttpStatus.CREATED);
     }
 
@@ -41,7 +41,7 @@ public class PlanController {
     @GetMapping
     @ApiResponse(code = 200, message = "일정 전체 조회 성공", response = List.class)
     public ImgoingResponse<List<PlanDto>> getAllPlans(User user) {
-        List<PlanDto> planDtos = planService.getPlans(user.getId()).stream()
+        List<PlanDto> planDtos = planService.getPlansByUser(user).stream()
                 .map(plan -> planMapper.toDto(plan, plan.getTaskList()))
                 .collect(Collectors.toList());
 

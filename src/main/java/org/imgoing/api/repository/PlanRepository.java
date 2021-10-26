@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public interface PlanRepository extends JpaRepository<Plan, Long> {
     @Query(value = "SELECT * FROM plan_tb WHERE plan_tb.user_id = :userId", nativeQuery = true)
-    List<Task> findAllByUserId(Long userId);
+    List<Plan> findAllByUserId(Long userId);
 
     Optional<Plan> findTopByUserAndArrivalAtGreaterThanOrderByArrivalAtAsc (User user, LocalDateTime now);
 }
