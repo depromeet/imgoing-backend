@@ -2,13 +2,12 @@ package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.*;
+import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
 import org.imgoing.api.dto.PlanDto;
-import org.imgoing.api.dto.TaskDto;
+import org.imgoing.api.dto.route.RouteSearchRequest;
+import org.imgoing.api.dto.task.TaskResponse;
 import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.mapper.TaskMapper;
-import org.imgoing.api.domain.entity.User;
-import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
-import org.imgoing.api.dto.route.RouteSearchRequest;
 import org.imgoing.api.repository.PlanRepository;
 import org.imgoing.api.repository.PlantaskRepository;
 import org.imgoing.api.repository.TaskRepository;
@@ -17,9 +16,9 @@ import org.imgoing.api.support.ImgoingException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +38,7 @@ public class PlanService {
     public Plan createPlan(User user, PlanDto.Create planSaveRequest) {
         Plan savedPlan = planRepository.save(planMapper.toEntityForSave(user, planSaveRequest));
 
-        List<TaskDto> taskDtos = planSaveRequest.getTask();
+        List<TaskResponse> taskDtos = planSaveRequest.getTask();
         List<Long> bookmarkedTaskIds = planSaveRequest.getBookmarkedTaskIds();
         if (taskDtos.isEmpty() && bookmarkedTaskIds.isEmpty()) {
             return savedPlan;
@@ -81,7 +80,7 @@ public class PlanService {
         Plan newPlan = planMapper.toEntity(planDto);
         plan.updatePlan(newPlan);
 
-        List<TaskDto> taskDtos = planDto.getTask();
+        List<TaskResponse> taskDtos = planDto.getTask();
 
         // TODO: 로직 수정
 
@@ -146,18 +145,18 @@ public class PlanService {
         }
     }
 
-    public List<Task> findNotBookmarkedTask (List<TaskDto> taskDtos) {
+    public List<Task> findNotBookmarkedTask (List<TaskResponse> taskDtos) {
         return taskDtos.stream()
                 .filter(taskDto -> !taskDto.getIsBookmarked())
-                .map(taskMapper::toEntity)
+                .map(taskMapper::responseToEntity)
                 .collect(Collectors.toList());
     }
 
     // 북마크 등록 안된 task 찾는 함수
-    public List<Task> findBookmarkedTask (List<TaskDto> taskDtos) {
+    public List<Task> findBookmarkedTask (List<TaskResponse> taskDtos) {
         return taskDtos.stream()
                 .filter(taskDto -> taskDto.getIsBookmarked())
-                .map(taskMapper::toEntity)
+                .map(taskMapper::responseToEntity)
                 .collect(Collectors.toList());
     }
 
