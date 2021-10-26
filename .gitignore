@@ -1,4 +1,5 @@
 .DS_Store
+src/main/resources/application.yml
 
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,gradle,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij,gradle,java
