@@ -20,7 +20,8 @@
 ## 📋 ERD
 <br>
 
-[<img src="https://user-images.githubusercontent.com/54519245/136658170-e93ec9e9-5443-40bf-a70b-1108c2ba50d4.png">](https://www.erdcloud.com/d/o9zDCf7gBw4t6MMh8)
+[<img src="https://user-images.githubusercontent.com/54519245/138887787-f20b2d0d-cd79-4b0f-9161-29ffdae3d696.PNG">](https://www.erdcloud.com/d/o9zDCf7gBw4t6MMh8)
+
  
 <br>
 
