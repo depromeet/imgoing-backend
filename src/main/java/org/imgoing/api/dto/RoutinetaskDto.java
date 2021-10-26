@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.imgoing.api.dto.task.TaskResponse;
 
 @SuperBuilder
 @Getter
@@ -22,6 +23,6 @@ public class RoutinetaskDto {
     @ApiModel(value = "루틴 - 준비항목 조회 모델")
     public static class Read extends RoutinetaskDto {
         @ApiModelProperty(value = "준비항목 모델")
-        private TaskDto.Read task;
+        private TaskResponse task;
     }
 }

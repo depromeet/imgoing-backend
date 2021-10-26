@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.imgoing.api.dto.task.TaskResponse;
 
 import java.util.List;
 
@@ -35,6 +36,6 @@ public class PlantaskDto {
         private Long id;
 
         @ApiModelProperty(value = "준비항목 모델")
-        private List<TaskDto> taskList;
+        private List<TaskResponse> taskList;
     }
 }
