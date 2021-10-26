@@ -1,5 +1,6 @@
 package org.imgoing.api.mapper;
 
+import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.dto.PlantaskDto;
 import org.imgoing.api.domain.entity.Plantask;
 import org.imgoing.api.domain.entity.Task;

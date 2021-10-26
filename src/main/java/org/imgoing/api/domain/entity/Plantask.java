@@ -1,12 +1,9 @@
 package org.imgoing.api.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -21,16 +18,16 @@ public class Plantask extends BaseTime {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @JsonBackReference
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "planId", referencedColumnName = "id")
     private Plan plan;
 
-    @OneToMany(orphanRemoval = true, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "taskId", referencedColumnName = "id")
-    private List<Task> taskList = new ArrayList<>();
+    private Task task;
 
-    public void modifyPlantask(List<Task> taskList) {
-        this.taskList = taskList;
+    public void setPlanTask(Plan plan, Task task) {
+        this.plan = plan;
+        this.task = task;
     }
 }
