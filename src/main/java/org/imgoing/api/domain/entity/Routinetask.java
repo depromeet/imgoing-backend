@@ -29,6 +29,7 @@ public class Routinetask extends BaseTime implements Comparable {
     @JoinColumn(name = "taskId", referencedColumnName = "id")
     private Task task;
 
+    @Column(nullable = false)
     private Integer priority;
 
     @Override
