@@ -13,10 +13,14 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RoutineService {
+    private final TaskService taskService;
+    private final RoutinetaskService routinetaskService;
     private final RoutineRepository routineRepository;
 
     @Transactional
-    public Routine create(Routine newRoutine){
+    public Routine create(Routine newRoutine, List<Long> taskIdList){
+        newRoutine.registerRoutinetasks(taskService.getListById(taskIdList));
+        routinetaskService.createAll(newRoutine.getRoutinetasks());
         return routineRepository.save(newRoutine);
     }
 

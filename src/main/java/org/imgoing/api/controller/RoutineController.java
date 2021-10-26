@@ -6,14 +6,12 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.Routine;
 import org.imgoing.api.domain.entity.Routinetask;
-import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.routine.RoutineRequest;
 import org.imgoing.api.dto.routine.RoutineResponse;
 import org.imgoing.api.mapper.RoutineMapper;
 import org.imgoing.api.service.RoutineService;
 import org.imgoing.api.service.RoutinetaskService;
-import org.imgoing.api.service.TaskService;
 import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +26,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/routines")
 public class RoutineController {
     private final RoutineService routineService;
-    private final TaskService taskService;
     private final RoutinetaskService routinetaskService;
 
     private final RoutineMapper routineMapper;
@@ -36,11 +33,11 @@ public class RoutineController {
     @ApiOperation(value = "루틴 생성")
     @PostMapping
     public ImgoingResponse<RoutineResponse> create(User user, @RequestBody @Valid RoutineRequest routineRequest) {
-        Routine newRoutine = routineService.create(routineMapper.toEntity(user, routineRequest));
-        List<Task> tasks = taskService.getListById(routineRequest.getTaskIdList());
-        List<Routinetask> newRoutinetasks = routinetaskService.createAll(newRoutine.registerRoutinetasks(tasks));
-
-        RoutineResponse response = routineMapper.toDto(newRoutine, newRoutinetasks);
+        Routine newRoutine = routineService.create(
+                routineMapper.toEntity(user, routineRequest),
+                routineRequest.getTaskIdList()
+        );
+        RoutineResponse response = routineMapper.toDto(newRoutine);
         return new ImgoingResponse<>(response, HttpStatus.CREATED);
     }
 
