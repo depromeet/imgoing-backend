@@ -1,8 +1,6 @@
 package org.imgoing.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
@@ -15,6 +13,7 @@ import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,48 +21,66 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RestController
 @Api(tags = "약속 관련 API")
-@RequestMapping("/api/v1/plan")
+@RequestMapping("/api/v1/plans")
 public class PlanController {
     private final PlanService planService;
     private final PlanMapper planMapper;
 
     @ApiOperation(value = "일정 생성")
     @PostMapping
-    public ImgoingResponse<PlanDto> create(User user, @RequestBody PlanDto planDto) {
-        Plan newPlan = planMapper.toEntity(planDto);
-        Plan savedPlan = planService.create(user, newPlan);
-        return new ImgoingResponse<>(planMapper.toDto(savedPlan), HttpStatus.CREATED);
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "일정 생성 성공", response = PlanDto.class),
+            @ApiResponse(code = 400, message = "일정 생성 실패")
+    })
+    public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanDto planDto) {
+        Plan plan = planService.createPlan(user, planDto);
+        return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()), HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "일정 전체 조회")
+    @ApiOperation(value = "일정 전체 조회", notes = "사용자의 전체 일정 조회")
     @GetMapping
-    public ImgoingResponse<List<PlanDto>> getList(User user) {
-        List<PlanDto> planDtoList = planService.getPlanByUserId(user.getId()).stream()
-                .map(planMapper::toDto)
+    @ApiResponse(code = 200, message = "일정 전체 조회 성공", response = List.class)
+    public ImgoingResponse<List<PlanDto>> getAllPlans(User user) {
+        List<PlanDto> planDtos = planService.getPlans(user.getId()).stream()
+                .map(plan -> planMapper.toDto(plan, plan.getTaskList()))
                 .collect(Collectors.toList());
-        return new ImgoingResponse<>(planDtoList, HttpStatus.OK);
+
+        return new ImgoingResponse<>(planDtos, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "일정 조회")
+    @ApiOperation(value = "일정 조회", notes = "사용자의 특정 일정 조회")
     @GetMapping("/{planId}")
+    @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanDto.class)
     public ImgoingResponse<PlanDto> getPlan(
             User user,
             @ApiParam(value = "일정 id", required = true, example = "1")
-            @PathVariable(value = "planId") Long id
+            @PathVariable(value = "planId") Long planId
     ) {
-        Plan plan = planService.getPlanById(id);
-        return new ImgoingResponse<>(planMapper.toDto(plan), HttpStatus.OK);
+        Plan plan = planService.getPlan(user.getId(), planId);
+        return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
+    }
+
+    @ApiOperation(value = "일정 수정")
+    @PutMapping
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "일정 수정 성공", response = PlanDto.class),
+            @ApiResponse(code = 400, message = "일정 수정 실패")
+    })
+    public ImgoingResponse<PlanDto> update (User user, @RequestBody @Valid PlanDto planDto) {
+        Plan plan = planService.updatePlan(user.getId(), planDto);
+        return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
     }
 
     @ApiOperation(value = "일정 삭제")
     @DeleteMapping("/{planId}")
+    @ApiResponse(code = 204, message = "일정 삭제 성공", response = String.class)
     public ImgoingResponse<String> delete(
             User user,
             @ApiParam(value = "일정 id", required = true, example = "1")
-            @PathVariable(value = "planId") Long id
+            @PathVariable(value = "planId") Long planId
     ) {
-        planService.delete(planService.getPlanById(id));
-        String responseMessage = "id = " + id + "일정이 삭제되었습니다.";
+        planService.deletePlan(user.getId(), planId);
+        String responseMessage = "planId = " + planId + "일정이 삭제되었습니다.";
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
 

@@ -25,4 +25,3 @@ public class RoutinetaskDto {
         private TaskDto.Read task;
     }
 }
-
