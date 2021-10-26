@@ -13,7 +13,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RoutineService {
-    private final TaskService taskService;
     private final RoutineRepository routineRepository;
 
     @Transactional
@@ -30,11 +29,6 @@ public class RoutineService {
     @Transactional(readOnly = true)
     public List<Routine> getListByUserId(Long userId){
         return routineRepository.findAllByUserId(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Routine> getAll(){
-        return routineRepository.findAll();
     }
 
     @Transactional
