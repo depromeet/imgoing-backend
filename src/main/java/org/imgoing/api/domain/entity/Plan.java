@@ -67,10 +67,15 @@ public class Plan extends BaseTime {
         this.plantasks.clear();
         List<Plantask> plantasks = tasks.stream()
                 .map(task -> Plantask.builder()
-                .plan(this)
-                .task(task)
-                .build())
-                .collect(Collectors.toList());
+                        .plan(this)
+                        .task(task)
+                        .build()
+                ).collect(Collectors.toList());
+        this.plantasks.addAll(plantasks);
+    }
+
+    public void registerPlantasks(List<Plantask> plantasks) {
+        this.plantasks.clear();
         this.plantasks.addAll(plantasks);
     }
 

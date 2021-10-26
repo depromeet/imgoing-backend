@@ -1,18 +1,17 @@
 package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
-import org.imgoing.api.domain.entity.Plan;
-import org.imgoing.api.domain.entity.Task;
-import org.imgoing.api.domain.entity.User;
+import org.imgoing.api.domain.entity.*;
 import org.imgoing.api.dto.PlanDto;
 import org.imgoing.api.dto.TaskDto;
 import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.mapper.TaskMapper;
-import org.imgoing.api.domain.entity.RouteSearcher;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
 import org.imgoing.api.dto.route.RouteSearchRequest;
 import org.imgoing.api.repository.PlanRepository;
+import org.imgoing.api.repository.PlantaskRepository;
+import org.imgoing.api.repository.TaskRepository;
 import org.imgoing.api.support.ImgoingError;
 import org.imgoing.api.support.ImgoingException;
 import org.springframework.stereotype.Service;
@@ -28,6 +27,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PlanService {
     private final PlanRepository planRepository;
+    private final TaskRepository taskRepository;
+    private final PlantaskRepository plantaskRepository;
     private final TaskService taskService;
     private final PlantaskService plantaskService;
     private final PlanMapper planMapper;
@@ -35,37 +36,33 @@ public class PlanService {
     private final RouteSearcher routeSearcher;
 
     @Transactional
-    public Plan createPlan(User user, PlanDto planDto) {
-        Plan plan = planMapper.toEntity(planDto);
-        plan.addUser(user);
+    public Plan createPlan(User user, PlanDto.Create planSaveRequest) {
+        Plan savedPlan = planRepository.save(planMapper.toEntityForSave(user, planSaveRequest));
 
-        // plan 저장
-        plan = planRepository.save(plan);
-        
-        List<TaskDto> taskDtos = planDto.getTask();
-        List<Task> tasks = new ArrayList<>();
-
-        // 준비항목이 없는 경우
-        if(taskDtos.size() == 0) {
-            return plan;
+        List<TaskDto> taskDtos = planSaveRequest.getTask();
+        List<Long> bookmarkedTaskIds = planSaveRequest.getBookmarkedTaskIds();
+        if (taskDtos.isEmpty() && bookmarkedTaskIds.isEmpty()) {
+            return savedPlan;
         }
+        List<Task> bookmarkedTasks = taskRepository.findAllByIdIn(bookmarkedTaskIds);
+        List<Task> notBookmarkedTasks = taskRepository.saveAll(findNotBookmarkedTask(taskDtos));
+        List<Task> tasks = new ArrayList<>();
+        tasks.addAll(bookmarkedTasks);
+        tasks.addAll(notBookmarkedTasks);
 
-        // 북마크가 아닌 준비항목은 task db에 저장
-        tasks = taskService.saveAll(findNotBookmarkedTask(taskDtos));
-
-        // plantask 등록
-        tasks.addAll(findBookmarkedTask(taskDtos));
-        plan.registerPlantask(tasks);
-
-        // plantask db 저장
-        plantaskService.saveAll(plan.getPlantasks());
-
-        return plan;
+        List<Plantask> plantasks = plantaskRepository.saveAll(tasks.stream()
+                .map(task -> Plantask.builder()
+                        .plan(savedPlan)
+                        .task(task)
+                        .build()
+                ).collect(Collectors.toList()));
+        savedPlan.registerPlantasks(plantasks);
+        return savedPlan;
     }
 
     @Transactional(readOnly = true)
-    public List<Plan> getPlans(Long userId) {
-        return planRepository.findAll();
+    public List<Plan> getPlansByUser(User user) {
+        return planRepository.findAllByUserId(user.getId());
     }
 
     @Transactional(readOnly = true)
@@ -149,7 +146,6 @@ public class PlanService {
         }
     }
 
-    // 북마크 등록 된 task 찾는 함수
     public List<Task> findNotBookmarkedTask (List<TaskDto> taskDtos) {
         return taskDtos.stream()
                 .filter(taskDto -> !taskDto.getIsBookmarked())
@@ -170,20 +166,18 @@ public class PlanService {
         LocalDateTime now = LocalDateTime.now();
         Plan recentPlan = planRepository.findTopByUserAndArrivalAtGreaterThanOrderByArrivalAtAsc(user, now)
                 .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "시간을 계산할 수 있는 Plan이 없습니다."));
-        // TODO: Hardcoding된 Lat, Lng 인풋으로 받기
-        double startLng = 126.9027279;
-        double startLat = 37.5349277;
         RouteSearchRequest requestDto = new RouteSearchRequest(
-                startLng,
-                startLat,
+                recentPlan.getDepartureLng(),
+                recentPlan.getDepartureLat(),
                 recentPlan.getArrivalLng(),
                 recentPlan.getArrivalLat(),
                 0
         );
         int routeAverageMins = (int) Math.ceil(routeSearcher.calcRouteAverageTime(requestDto));
+        int preparationMins = recentPlan.getPlantasks().stream().mapToInt(pt -> pt.getTask().getTime()).sum();
         LocalDateTime recentPlanArrivalAt = recentPlan.getArrivalAt();
-        // TODO: PlanTask들의 준비시간 합해서 계산해서 minus 해주기
-        Duration remainingTime = Duration.between(now, recentPlanArrivalAt.minusMinutes(routeAverageMins));
-        return new RemainingTimeInfoVo(remainingTime, routeAverageMins, 0, recentPlanArrivalAt);
+        LocalDateTime preparationStartAt = recentPlanArrivalAt.minusMinutes(routeAverageMins + preparationMins);
+        Duration remainingTime = Duration.between(now, preparationStartAt);
+        return new RemainingTimeInfoVo(remainingTime, routeAverageMins, preparationMins, recentPlanArrivalAt);
     }
 }
