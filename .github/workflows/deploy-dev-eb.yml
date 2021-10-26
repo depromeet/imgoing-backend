@@ -2,7 +2,7 @@ name: Deploy to Test EB
 
 on:
   push:
-    branches: [ develop, feature/hide-spring-config ]
+    branches: [ develop ]
 
 jobs:
   build:
