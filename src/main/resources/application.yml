@@ -18,4 +18,3 @@ spring:
         format_sql: true # sql prettier
 keys:
   jwtSecretKey: T_Ga_rljfex6u_YBhPqiF6ulR9rAgnJHW-u-crLOX1pqI6B27MFMTC8JpwoVGZ6f9MYexML-Gb2xZJt9VCaIwK6nDULNbj8FlYYn0tTVxyHjySFPeJSCva28hAich_AuDOYmf_-C6kt1yTEWKxhEWuTrfyVMkquzjYzO4Z_gRmCeYYuq35HWkCftu1-YE73wFjPsUwZkV2QR6VWpY1ny7WgiVCIN8TKshc5dvreuPK5Jdy0lldUGs_yvgHwGqHNXG8i_sMhrpPBQpDfmsuqjW4pxCsIRltRhIRilaYWAdApDHFgnlrakMPcjJuuoBODTrWx5Xa57O2uXh-hz0TX1Kw
-  odsayApiKey: ZBKq6aXbGmDGKMrCRUJcKE%2FA6FXFrAkrgmgqhz1VPqY

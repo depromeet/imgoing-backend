@@ -24,9 +24,7 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            s3://imgoing-spring-config/application-dev.yml src/main/resources/
-      - name: Show yml for test
-        run: cat src/main/resources/application-dev.yml
+            ${{ secrets.CONFIG_BUCKET }}/application-dev.yml src/main/resources/
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
