@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.imgoing.api.dto.RoutinetaskDto;
+import org.imgoing.api.dto.RoutinetaskResponse;
 
 import java.util.List;
 
@@ -23,5 +23,5 @@ public class RoutineResponse {
     private String name;
 
     @ApiModelProperty(value = "준비항목 목록")
-    private List<RoutinetaskDto.Read> routinetasks;
+    private List<RoutinetaskResponse> routinetasks;
 }

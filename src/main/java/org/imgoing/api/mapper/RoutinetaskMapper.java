@@ -1,7 +1,7 @@
 package org.imgoing.api.mapper;
 
 import org.imgoing.api.domain.entity.Routinetask;
-import org.imgoing.api.dto.RoutinetaskDto;
+import org.imgoing.api.dto.RoutinetaskResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -11,5 +11,5 @@ import org.mapstruct.ReportingPolicy;
 ) // 일치하지 않는 필드를 무시
 
 public interface RoutinetaskMapper {
-    RoutinetaskDto toDto(Routinetask routinetask);
+    RoutinetaskResponse toDto(Routinetask routinetask);
 }
