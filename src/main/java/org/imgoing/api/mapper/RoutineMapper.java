@@ -3,8 +3,8 @@ package org.imgoing.api.mapper;
 import org.imgoing.api.domain.entity.Routine;
 import org.imgoing.api.domain.entity.Routinetask;
 import org.imgoing.api.domain.entity.User;
+import org.imgoing.api.dto.routine.RoutineDto;
 import org.imgoing.api.dto.routine.RoutineRequest;
-import org.imgoing.api.dto.routine.RoutineResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -27,7 +27,5 @@ public interface RoutineMapper {
     Routine toEntity(Long id, User user, RoutineRequest routineCreateRequest);
 
     @Mapping(target = "routinetasks", source = "routinetasks")
-    RoutineResponse toDto(Routine routine, List<Routinetask> routinetasks);
-
-    RoutineResponse toDto(Routine routine);
+    RoutineDto toDto(Routine routine, List<Routinetask> routinetasks);
 }

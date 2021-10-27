@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.Routine;
 import org.imgoing.api.domain.entity.Routinetask;
 import org.imgoing.api.domain.entity.User;
+import org.imgoing.api.dto.routine.RoutineDto;
 import org.imgoing.api.dto.routine.RoutineRequest;
-import org.imgoing.api.dto.routine.RoutineResponse;
 import org.imgoing.api.mapper.RoutineMapper;
 import org.imgoing.api.service.RoutineService;
 import org.imgoing.api.service.RoutinetaskService;
@@ -32,19 +32,19 @@ public class RoutineController {
 
     @ApiOperation(value = "루틴 생성")
     @PostMapping
-    public ImgoingResponse<RoutineResponse> create(User user, @RequestBody @Valid RoutineRequest routineRequest) {
+    public ImgoingResponse<RoutineDto> create(User user, @RequestBody @Valid RoutineRequest routineRequest) {
         Routine newRoutine = routineService.create(
                 routineMapper.toEntity(user, routineRequest),
                 routineRequest.getTaskIdList()
         );
-        RoutineResponse response = routineMapper.toDto(newRoutine);
+        RoutineDto response = routineMapper.toDto(newRoutine, newRoutine.getRoutinetasks());
         return new ImgoingResponse<>(response, HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "루틴 전체 조회")
     @GetMapping
-    public ImgoingResponse<List<RoutineResponse>> getAll(User user) {
-        List<RoutineResponse> response = routineService.getListByUserId(user.getId()).stream()
+    public ImgoingResponse<List<RoutineDto>> getAll(User user) {
+        List<RoutineDto> response = routineService.getListByUserId(user.getId()).stream()
                 .map(routine -> routineMapper.toDto(routine, routine.getRoutinetasks()))
                 .collect(Collectors.toList());
         return new ImgoingResponse<>(response, HttpStatus.OK);
@@ -52,13 +52,13 @@ public class RoutineController {
 
     @ApiOperation(value = "루틴 조회")
     @GetMapping("/{routineId}")
-    public ImgoingResponse<RoutineResponse> get(
+    public ImgoingResponse<RoutineDto> get(
             User user,
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "routineId") Long id
     ) {
         Routine routine = routineService.getById(id);
-        RoutineResponse response = routineMapper.toDto(routine, routine.getRoutinetasks());
+        RoutineDto response = routineMapper.toDto(routine, routine.getRoutinetasks());
         return new ImgoingResponse<>(response, HttpStatus.OK);
     }
 
@@ -78,7 +78,7 @@ public class RoutineController {
 
     @ApiOperation(value = "루틴 수정")
     @PutMapping("/{routineId}")
-    public ImgoingResponse<RoutineResponse> update(
+    public ImgoingResponse<RoutineDto> update(
             User user,
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "routineId") Long id,
@@ -88,7 +88,7 @@ public class RoutineController {
         Routine routine = routineService.getById(id);
         List<Routinetask> routinetasks = routinetaskService.update(routine, routineRequest.getTaskIdList());
 
-        RoutineResponse response = routineMapper.toDto(routine, routinetasks);
+        RoutineDto response = routineMapper.toDto(routine, routinetasks);
         return new ImgoingResponse<>(response, HttpStatus.CREATED);
     }
 }

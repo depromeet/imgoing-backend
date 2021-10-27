@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.imgoing.api.dto.RoutinetaskResponse;
+import org.imgoing.api.dto.routinetask.RoutinetaskDto;
 
 import java.util.List;
 
@@ -14,8 +14,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel(value = "루틴 응답 모델")
-public class RoutineResponse {
+@ApiModel(value = "루틴 모델")
+public class RoutineDto {
     @ApiModelProperty(value = "루틴 id")
     private Long id;
 
@@ -23,5 +23,5 @@ public class RoutineResponse {
     private String name;
 
     @ApiModelProperty(value = "준비항목 목록")
-    private List<RoutinetaskResponse> routinetasks;
+    private List<RoutinetaskDto> routinetasks;
 }

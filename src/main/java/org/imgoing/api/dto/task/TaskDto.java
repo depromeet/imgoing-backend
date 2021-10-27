@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel(value = "준비항목 응답 모델")
-public class TaskResponse {
+@ApiModel(value = "준비항목 모델")
+public class TaskDto {
     @ApiModelProperty(value = "준비항목 id")
     private Long id;
 

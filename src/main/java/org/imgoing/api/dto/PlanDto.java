@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.validator.constraints.Length;
-import org.imgoing.api.dto.task.TaskResponse;
+import org.imgoing.api.dto.task.TaskDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -64,7 +64,7 @@ public class PlanDto {
     private String belongings;
 
     @ApiModelProperty(value = "준비항목")
-    private List<TaskResponse> task;
+    private List<TaskDto> task;
 
     @SuperBuilder
     @Getter

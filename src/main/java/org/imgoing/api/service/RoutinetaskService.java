@@ -19,6 +19,20 @@ public class RoutinetaskService {
     private final RoutinetaskRepository routinetaskRepository;
 
     @Transactional
+    public List<Routinetask> createAll(List<Routinetask> routinetasks){
+        for(Routinetask rt : routinetasks) {
+            if(!rt.getTask().getIsBookmarked())
+                throw new ImgoingException(ImgoingError.BAD_REQUEST, "루틴에 북마크가 아닌 준비항목을 추가할 수 없습니다.");
+        }
+        return routinetaskRepository.saveAll(routinetasks);
+    }
+
+    @Transactional
+    public void deleteAll(List<Routinetask> routinetasks){
+        routinetaskRepository.deleteAll(routinetasks);
+    }
+
+    @Transactional
     public List<Routinetask> update(Routine routine, List<Long> updateTaskIdList) {
         List<Routinetask> routinetasks = routine.getRoutinetasks();
 
@@ -55,19 +69,5 @@ public class RoutinetaskService {
             }
         }
         return this.createAll(routinetasks);
-    }
-
-    @Transactional
-    public List<Routinetask> createAll(List<Routinetask> routinetasks){
-        for(Routinetask rt : routinetasks) {
-            if(!rt.getTask().getIsBookmarked())
-                throw new ImgoingException(ImgoingError.BAD_REQUEST, "루틴에 북마크가 아닌 준비항목을 추가할 수 없습니다.");
-        }
-        return routinetaskRepository.saveAll(routinetasks);
-    }
-
-    @Transactional
-    public void deleteAll(List<Routinetask> routinetasks){
-        routinetaskRepository.deleteAll(routinetasks);
     }
 }

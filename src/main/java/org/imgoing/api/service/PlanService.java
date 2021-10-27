@@ -5,7 +5,7 @@ import org.imgoing.api.domain.entity.*;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
 import org.imgoing.api.dto.PlanDto;
 import org.imgoing.api.dto.route.RouteSearchRequest;
-import org.imgoing.api.dto.task.TaskResponse;
+import org.imgoing.api.dto.task.TaskDto;
 import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.mapper.TaskMapper;
 import org.imgoing.api.repository.PlanRepository;
@@ -38,7 +38,7 @@ public class PlanService {
     public Plan createPlan(User user, PlanDto.Create planSaveRequest) {
         Plan savedPlan = planRepository.save(planMapper.toEntityForSave(user, planSaveRequest));
 
-        List<TaskResponse> taskDtos = planSaveRequest.getTask();
+        List<TaskDto> taskDtos = planSaveRequest.getTask();
         List<Long> bookmarkedTaskIds = planSaveRequest.getBookmarkedTaskIds();
         if (taskDtos.isEmpty() && bookmarkedTaskIds.isEmpty()) {
             return savedPlan;
@@ -80,7 +80,7 @@ public class PlanService {
         Plan newPlan = planMapper.toEntity(planDto);
         plan.updatePlan(newPlan);
 
-        List<TaskResponse> taskDtos = planDto.getTask();
+        List<TaskDto> taskDtos = planDto.getTask();
 
         // TODO: 로직 수정
 
@@ -145,7 +145,7 @@ public class PlanService {
         }
     }
 
-    public List<Task> findNotBookmarkedTask (List<TaskResponse> taskDtos) {
+    public List<Task> findNotBookmarkedTask (List<TaskDto> taskDtos) {
         return taskDtos.stream()
                 .filter(taskDto -> !taskDto.getIsBookmarked())
                 .map(taskMapper::responseToEntity)
@@ -153,7 +153,7 @@ public class PlanService {
     }
 
     // 북마크 등록 안된 task 찾는 함수
-    public List<Task> findBookmarkedTask (List<TaskResponse> taskDtos) {
+    public List<Task> findBookmarkedTask (List<TaskDto> taskDtos) {
         return taskDtos.stream()
                 .filter(taskDto -> taskDto.getIsBookmarked())
                 .map(taskMapper::responseToEntity)

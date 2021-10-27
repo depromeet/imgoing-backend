@@ -3,7 +3,7 @@ package org.imgoing.api.mapper;
 import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.task.TaskRequest;
-import org.imgoing.api.dto.task.TaskResponse;
+import org.imgoing.api.dto.task.TaskDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -22,7 +22,7 @@ public interface TaskMapper {
     Task requestToEntity(Long id, User user, TaskRequest taskRequest);
 
     @Mapping(target = "routinetasks", ignore = true)
-    Task responseToEntity(TaskResponse taskResponse);
+    Task responseToEntity(TaskDto taskDto);
 
-    TaskResponse toDto(Task task);
+    TaskDto toDto(Task task);
 }
