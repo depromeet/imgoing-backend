@@ -17,18 +17,18 @@ import javax.validation.constraints.Positive;
 @AllArgsConstructor
 @ApiModel(value = "준비항목 요청 모델")
 public class TaskRequest {
-    @NotBlank(message = "{task.notBlank.name}")
-    @Length(max = 50, message = "{task.length.name}")
+    @NotBlank(message = "준비항목 이름은 필수값 입니다.")
+    @Length(max = 50, message = "준비항목 이름은 최대 50자 까지 입니다.")
     @ApiModelProperty(required = true, value = "준비항목 이름", example = "준비항목 1")
     private String name;
 
-    @NotNull(message = "{task.notNull.time}")
-    @Positive (message = "{task.positive.time}")
-    @Max(value = Integer.MAX_VALUE, message = "{task.max.time}")
+    @NotNull(message = "시간은 null일 수 없습니다.")
+    @Positive (message = "준비항목 시간은 0보다 커야 합니다.")
+    @Max(value = Integer.MAX_VALUE, message = "시간의 최댓값은 2,147,483,647 입니다.")
     @ApiModelProperty(required = true, value = "준비항목 시간", example = "20")
     private Integer time;
 
-    @NotNull(message = "{task.notNull.isBookmarked}")
+    @NotNull(message = "준비항목 북마크 여부는 null일 수 없습니다.")
     @ApiModelProperty(required = true, value = "준비항목 북마크 여부", example = "true")
     private Boolean isBookmarked;
 }

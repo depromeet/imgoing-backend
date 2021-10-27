@@ -16,12 +16,12 @@ import java.util.List;
 @AllArgsConstructor
 @ApiModel(value = "루틴 요청 모델")
 public class RoutineRequest {
-    @NotBlank(message = "{routine.notBlank.name}")
-    @Length(max = 50, message = "{routine.length.name}")
+    @NotBlank(message = "루틴 이름은 필수값 입니다.")
+    @Length(max = 50, message = "루틴 이름은 최대 50자 까지 입니다.")
     @ApiModelProperty(required = true, value = "루틴 이름", example = "루틴 1")
     private String name;
 
-    @NotNull(message = "{routine.notNull.taskIdList}")
+    @NotNull(message = "준비항목 id 리스트는 null일 수 없습니다.")
     @ApiModelProperty(required = true, value = "준비항목 id 리스트", example = "[1, 2, 3]")
     private List<Long> taskIdList;
 }
