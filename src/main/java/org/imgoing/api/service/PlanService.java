@@ -2,13 +2,12 @@ package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.*;
+import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
 import org.imgoing.api.dto.PlanDto;
-import org.imgoing.api.dto.TaskDto;
+import org.imgoing.api.dto.route.RouteSearchRequest;
+import org.imgoing.api.dto.task.TaskDto;
 import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.mapper.TaskMapper;
-import org.imgoing.api.domain.entity.User;
-import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
-import org.imgoing.api.dto.route.RouteSearchRequest;
 import org.imgoing.api.repository.PlanRepository;
 import org.imgoing.api.repository.PlantaskRepository;
 import org.imgoing.api.repository.TaskRepository;
@@ -17,9 +16,9 @@ import org.imgoing.api.support.ImgoingException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -149,7 +148,7 @@ public class PlanService {
     public List<Task> findNotBookmarkedTask (List<TaskDto> taskDtos) {
         return taskDtos.stream()
                 .filter(taskDto -> !taskDto.getIsBookmarked())
-                .map(taskMapper::toEntity)
+                .map(taskMapper::responseToEntity)
                 .collect(Collectors.toList());
     }
 
@@ -157,7 +156,7 @@ public class PlanService {
     public List<Task> findBookmarkedTask (List<TaskDto> taskDtos) {
         return taskDtos.stream()
                 .filter(taskDto -> taskDto.getIsBookmarked())
-                .map(taskMapper::toEntity)
+                .map(taskMapper::responseToEntity)
                 .collect(Collectors.toList());
     }
 

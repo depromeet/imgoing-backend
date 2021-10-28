@@ -42,7 +42,7 @@ public class Routine extends BaseTime {
         return routinetasks;
     }
 
-    public List<Routinetask> makeRoutinetasks(List<Task> tasks) {
+    public void registerRoutinetasks(List<Task> tasks) {
         List<Routinetask> rt = new ArrayList<>();
         for(int i = 0; i < tasks.size(); ++i) {
             rt.add(Routinetask.builder()
@@ -51,6 +51,6 @@ public class Routine extends BaseTime {
                     .priority(i)
                     .build());
         }
-        return rt;
+        this.routinetasks = rt;
     }
 }

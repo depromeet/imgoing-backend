@@ -1,7 +1,7 @@
 package org.imgoing.api.mapper;
 
 import org.imgoing.api.domain.entity.Routinetask;
-import org.imgoing.api.dto.RoutinetaskDto;
+import org.imgoing.api.dto.routinetask.RoutinetaskDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

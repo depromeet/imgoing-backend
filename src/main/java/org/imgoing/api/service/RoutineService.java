@@ -14,10 +14,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoutineService {
     private final TaskService taskService;
+    private final RoutinetaskService routinetaskService;
     private final RoutineRepository routineRepository;
 
     @Transactional
-    public Routine create(Routine newRoutine){
+    public Routine create(Routine newRoutine, List<Long> taskIdList){
+        newRoutine.registerRoutinetasks(taskService.getListById(taskIdList));
+        routinetaskService.createAll(newRoutine.getRoutinetasks());
         return routineRepository.save(newRoutine);
     }
 
@@ -30,11 +33,6 @@ public class RoutineService {
     @Transactional(readOnly = true)
     public List<Routine> getListByUserId(Long userId){
         return routineRepository.findAllByUserId(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Routine> getAll(){
-        return routineRepository.findAll();
     }
 
     @Transactional

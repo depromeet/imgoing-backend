@@ -1,6 +1,8 @@
 package org.imgoing.api.domain.entity;
 
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
@@ -20,7 +22,7 @@ public class Task extends BaseTime {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String name;
 
     @Column(nullable = false)
@@ -28,6 +30,11 @@ public class Task extends BaseTime {
 
     @Column(nullable = false)
     private Boolean isBookmarked;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "userId", referencedColumnName = "id")
+    private User user;
 
     @OneToMany(mappedBy = "task")
     private List<Routinetask> routinetasks = new ArrayList<>();
