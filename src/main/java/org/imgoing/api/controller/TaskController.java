@@ -51,8 +51,17 @@ public class TaskController {
 
     @ApiOperation(value = "준비항목 리스트 전체 조회")
     @GetMapping
-    public ImgoingResponse<List<TaskDto>> getListAll(User user){
+    public ImgoingResponse<List<TaskDto>> getList(User user){
         List<TaskDto> response = taskService.getListByUserId(user.getId()).stream()
+                .map(taskMapper::toDto)
+                .collect(Collectors.toList());
+        return new ImgoingResponse<>(response);
+    }
+
+    @ApiOperation(value = "북마크 된 준비항목 리스트 전체 조회")
+    @GetMapping("/bookmarked")
+    public ImgoingResponse<List<TaskDto>> getBookmarkedList(User user){
+        List<TaskDto> response = taskService.getListByUserIdAndIsBookmarked(user.getId()).stream()
                 .map(taskMapper::toDto)
                 .collect(Collectors.toList());
         return new ImgoingResponse<>(response);
