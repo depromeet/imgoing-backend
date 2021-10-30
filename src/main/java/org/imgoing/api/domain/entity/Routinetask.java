@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Routinetask extends BaseTime implements Comparable {
+public class Routinetask extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -31,12 +31,6 @@ public class Routinetask extends BaseTime implements Comparable {
 
     @Column(nullable = false)
     private Integer priority;
-
-    @Override
-    public int compareTo(Object o) {
-        Routinetask routinetask = (Routinetask)o;
-        return this.priority - routinetask.priority;
-    }
 
     public void addPriority(Integer priority) {
         this.priority = priority;

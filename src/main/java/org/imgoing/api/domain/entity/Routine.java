@@ -7,7 +7,7 @@ import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -38,7 +38,7 @@ public class Routine extends BaseTime {
     }
 
     public List<Routinetask> getRoutinetasks() {
-        if(routinetasks != null) Collections.sort(routinetasks);
+        if(routinetasks != null) routinetasks.sort(Comparator.comparing(Routinetask::getPriority));
         return routinetasks;
     }
 
