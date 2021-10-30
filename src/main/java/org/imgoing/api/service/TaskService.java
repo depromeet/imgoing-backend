@@ -40,8 +40,8 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
-    public List<Task> getListAll(){
-        return taskRepository.findAll();
+    public List<Task> getListByUserIdAndIsBookmarked(Long userId){
+        return taskRepository.findAllByUserIdAndIsBookmarked(userId);
     }
 
     @Transactional
