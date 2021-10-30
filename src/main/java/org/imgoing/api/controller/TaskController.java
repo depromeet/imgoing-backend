@@ -32,7 +32,7 @@ public class TaskController {
             User user,
             @RequestBody @Valid TaskRequest taskRequest
     ) {
-        Task newTask = taskService.create(taskMapper.requestToEntity(user, taskRequest));
+        Task newTask = taskService.create(taskMapper.toEntity(user, taskRequest));
         TaskDto response = taskMapper.toDto(newTask);
         return new ImgoingResponse<>(response, HttpStatus.CREATED);
     }
@@ -65,11 +65,9 @@ public class TaskController {
             @ApiParam(value = "준비항목 id", required = true, example = "1")
             @PathVariable(value = "taskId") Long id
     ) {
-        Task task = taskService.getById(id);
-        String name = task.getName();
+        Task task = Task.builder().id(id).build();
         taskService.delete(task);
-        String responseMessage = name + " 이(가) 삭제되었습니다.";
-        return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
+        return new ImgoingResponse<>(HttpStatus.NO_CONTENT, "준비항목이 삭제되었습니다.");
     }
 
     @ApiOperation(value = "준비항목 수정")
@@ -80,8 +78,8 @@ public class TaskController {
             @PathVariable(value = "taskId") Long id,
             @RequestBody @Valid TaskRequest taskRequest
     ) {
-        Task updateTask = taskMapper.requestToEntity(id, user, taskRequest);
-        TaskDto response = taskMapper.toDto(taskService.update(updateTask));
+        Task newTask = taskService.update(taskMapper.toEntity(id, user, taskRequest));
+        TaskDto response = taskMapper.toDto(newTask);
         return new ImgoingResponse<>(response, HttpStatus.CREATED);
     }
 }

@@ -14,15 +14,16 @@ public interface TaskMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", source = "user")
     @Mapping(target = "routinetasks", ignore = true)
-    Task requestToEntity(User user, TaskRequest taskRequest);
+    Task toEntity(User user, TaskRequest taskRequest);
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "user", source = "user")
     @Mapping(target = "routinetasks", ignore = true)
-    Task requestToEntity(Long id, User user, TaskRequest taskRequest);
+    Task toEntity(Long id, User user, TaskRequest taskRequest);
 
+    @Mapping(target = "user", ignore = true)
     @Mapping(target = "routinetasks", ignore = true)
-    Task responseToEntity(TaskDto taskDto);
+    Task toEntity(TaskDto taskDto);
 
     TaskDto toDto(Task task);
 }

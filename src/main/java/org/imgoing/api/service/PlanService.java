@@ -148,7 +148,7 @@ public class PlanService {
     public List<Task> findNotBookmarkedTask (List<TaskDto> taskDtos) {
         return taskDtos.stream()
                 .filter(taskDto -> !taskDto.getIsBookmarked())
-                .map(taskMapper::responseToEntity)
+                .map(taskMapper::toEntity)
                 .collect(Collectors.toList());
     }
 
@@ -156,7 +156,7 @@ public class PlanService {
     public List<Task> findBookmarkedTask (List<TaskDto> taskDtos) {
         return taskDtos.stream()
                 .filter(taskDto -> taskDto.getIsBookmarked())
-                .map(taskMapper::responseToEntity)
+                .map(taskMapper::toEntity)
                 .collect(Collectors.toList());
     }
 

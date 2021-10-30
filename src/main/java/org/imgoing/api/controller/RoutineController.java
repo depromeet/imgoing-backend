@@ -5,13 +5,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.Routine;
-import org.imgoing.api.domain.entity.Routinetask;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.routine.RoutineDto;
 import org.imgoing.api.dto.routine.RoutineRequest;
 import org.imgoing.api.mapper.RoutineMapper;
 import org.imgoing.api.service.RoutineService;
-import org.imgoing.api.service.RoutinetaskService;
 import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +24,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/routines")
 public class RoutineController {
     private final RoutineService routineService;
-    private final RoutinetaskService routinetaskService;
-
     private final RoutineMapper routineMapper;
 
     @ApiOperation(value = "루틴 생성")
@@ -69,8 +65,8 @@ public class RoutineController {
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "routineId") Long id
     ) {
-        Routine routine = routineService.getById(id);
-        String responseMessage = "루틴 " + routine.getName() + " 이(가) 삭제되었습니다.";
+        Routine routine = Routine.builder().id(id).build();
+        String responseMessage = "루틴이 삭제되었습니다.";
         routineService.delete(routine);
 
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
@@ -83,12 +79,8 @@ public class RoutineController {
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "routineId") Long id,
             @RequestBody @Valid RoutineRequest routineRequest){
-        routineService.update(routineMapper.toEntity(id, user, routineRequest));
-
-        Routine routine = routineService.getById(id);
-        List<Routinetask> routinetasks = routinetaskService.update(routine, routineRequest.getTaskIdList());
-
-        RoutineDto response = routineMapper.toDto(routine, routinetasks);
+        Routine newRoutine = routineService.update(routineMapper.toEntity(id, user, routineRequest), routineRequest.getTaskIdList());
+        RoutineDto response = routineMapper.toDto(newRoutine, newRoutine.getRoutinetasks());
         return new ImgoingResponse<>(response, HttpStatus.CREATED);
     }
 }
