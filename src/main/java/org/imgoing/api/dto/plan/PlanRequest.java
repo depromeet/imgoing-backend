@@ -1,5 +1,6 @@
-package org.imgoing.api.dto;
+package org.imgoing.api.dto.plan;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -17,10 +18,9 @@ import java.util.List;
 
 @SuperBuilder
 @Getter
-@Setter
 @NoArgsConstructor
 @ApiModel(value = "악속 정보", description = "약속 모델")
-public class PlanDto {
+public class PlanRequest {
     @ApiModelProperty(value = "일정 id")
     private Long id;
 
@@ -53,7 +53,8 @@ public class PlanDto {
     private Double arrivalLng;
 
     @NotNull(message = "도착 시간은 필수값 입니다.")
-    @ApiModelProperty(required = true, value = "도착 시간", example = "2021-10-15T15:46:54.191Z")
+    @ApiModelProperty(required = true, value = "도착 시간", example = "2021-12-15 15:46:54")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime arrivalAt;
 
     @Length(max = 100, message = "메모는 최대 100자 까지 입니다.")
@@ -72,7 +73,7 @@ public class PlanDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @ApiModel(value = "플랜 생성 모델")
-    public static class Create extends PlanDto {
+    public static class Create extends PlanRequest {
         @ApiModelProperty(value = "북마크 리스트")
         private List<Long> bookmarkedTaskIds;
     }

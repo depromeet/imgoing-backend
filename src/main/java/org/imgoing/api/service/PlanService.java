@@ -1,9 +1,10 @@
 package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.imgoing.api.domain.entity.*;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
-import org.imgoing.api.dto.PlanDto;
+import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.dto.route.RouteSearchRequest;
 import org.imgoing.api.dto.task.TaskDto;
 import org.imgoing.api.mapper.PlanMapper;
@@ -35,14 +36,16 @@ public class PlanService {
     private final RouteSearcher routeSearcher;
 
     @Transactional
-    public Plan createPlan(User user, PlanDto.Create planSaveRequest) {
+    public Plan createPlan(User user, PlanRequest.Create planSaveRequest) {
         Plan savedPlan = planRepository.save(planMapper.toEntityForSave(user, planSaveRequest));
 
         List<TaskDto> taskDtos = planSaveRequest.getTask();
         List<Long> bookmarkedTaskIds = planSaveRequest.getBookmarkedTaskIds();
         if (taskDtos.isEmpty() && bookmarkedTaskIds.isEmpty()) {
+            savedPlan.registerPlantasks(new ArrayList<>());
             return savedPlan;
         }
+
         List<Task> bookmarkedTasks = taskRepository.findAllByIdIn(bookmarkedTaskIds);
         List<Task> notBookmarkedTasks = taskRepository.saveAll(findNotBookmarkedTask(taskDtos));
         List<Task> tasks = new ArrayList<>();
@@ -61,7 +64,8 @@ public class PlanService {
 
     @Transactional(readOnly = true)
     public List<Plan> getPlansByUser(User user) {
-        return planRepository.findAllByUserId(user.getId());
+        LocalDateTime now = LocalDateTime.now();
+        return planRepository.findByUserIdAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(user.getId(), now);
     }
 
     @Transactional(readOnly = true)
@@ -73,14 +77,14 @@ public class PlanService {
     }
 
     @Transactional
-    public Plan updatePlan(Long userId, PlanDto planDto) {
-        Plan plan = getPlanById(planDto.getId()); // oldPlan
+    public Plan updatePlan(Long userId, PlanRequest planRequest) {
+        Plan plan = getPlanById(planRequest.getId()); // oldPlan
         validateAuthorizedUser(userId, plan);
 
-        Plan newPlan = planMapper.toEntity(planDto);
+        Plan newPlan = planMapper.toEntity(planRequest);
         plan.updatePlan(newPlan);
 
-        List<TaskDto> taskDtos = planDto.getTask();
+        List<TaskDto> taskDtos = planRequest.getTask();
 
         // TODO: 로직 수정
 
@@ -152,7 +156,6 @@ public class PlanService {
                 .collect(Collectors.toList());
     }
 
-    // 북마크 등록 안된 task 찾는 함수
     public List<Task> findBookmarkedTask (List<TaskDto> taskDtos) {
         return taskDtos.stream()
                 .filter(taskDto -> taskDto.getIsBookmarked())
