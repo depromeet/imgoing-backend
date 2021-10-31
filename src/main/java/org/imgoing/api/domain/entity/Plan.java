@@ -59,10 +59,6 @@ public class Plan extends BaseTime {
     @OneToMany(mappedBy = "plan", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Plantask> plantasks = new ArrayList<>();
 
-    public void addUser(User user) {
-        this.user = user;
-    }
-
     public void registerPlantask(List<Task> tasks) {
         this.plantasks.clear();
         List<Plantask> plantasks = tasks.stream()
@@ -74,9 +70,9 @@ public class Plan extends BaseTime {
         this.plantasks.addAll(plantasks);
     }
 
+    // plantask 새로 추가
     public void registerPlantasks(List<Plantask> plantasks) {
-        this.plantasks.clear();
-        this.plantasks.addAll(plantasks);
+        this.plantasks = plantasks;
     }
 
     public List<Task> getTaskList() {
