@@ -1,10 +1,12 @@
 package org.imgoing.api.dto.auth;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class SocialLoginRequest {
-    private final String accessToken;
+    private String accessToken;
 }
