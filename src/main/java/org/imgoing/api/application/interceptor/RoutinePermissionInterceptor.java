@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.CertificateAuthority;
 import org.imgoing.api.domain.entity.Routine;
 import org.imgoing.api.domain.vo.TokenPayload;
-import org.imgoing.api.service.RoutineService;
+import org.imgoing.api.repository.RoutineRepository;
 import org.imgoing.api.support.ImgoingError;
 import org.imgoing.api.support.ImgoingException;
 import org.springframework.http.HttpMethod;
@@ -19,7 +19,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class RoutinePermissionInterceptor implements HandlerInterceptor {
-    private final RoutineService routineService;
+    private final RoutineRepository routineRepository;
     private final CertificateAuthority certificateAuthority;
 
     @Override
@@ -31,12 +31,12 @@ public class RoutinePermissionInterceptor implements HandlerInterceptor {
                 || HttpMethod.PUT.matches(requestHttpMethod)
                 || HttpMethod.DELETE.matches(requestHttpMethod) ) {
             TokenPayload payload = certificateAuthority.decrypt(request.getHeader("x-access-token"));
-            String[] path = routineService.getClass().getSuperclass().toString().split("\\.");
-            String entityName = path[path.length - 1].toLowerCase().replace("service", "");
 
-            Long id = Long.parseLong((String)pathVariables.get(entityName + "Id"));
+            Long id = Long.parseLong((String)pathVariables.get("routineId"));
 
-            Routine data = routineService.getById(id);
+            Routine data = routineRepository.findById(id)
+                    .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 루틴입니다."));
+
             if(data.getUser().getId() == payload.getId()) {
                 return true;
             }

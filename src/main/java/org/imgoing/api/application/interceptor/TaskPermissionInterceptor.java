@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.CertificateAuthority;
 import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.domain.vo.TokenPayload;
-import org.imgoing.api.service.TaskService;
+import org.imgoing.api.repository.TaskRepository;
 import org.imgoing.api.support.ImgoingError;
 import org.imgoing.api.support.ImgoingException;
 import org.springframework.http.HttpMethod;
@@ -19,7 +19,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class TaskPermissionInterceptor implements HandlerInterceptor {
-    private final TaskService taskService;
+    private final TaskRepository taskRepository;
     private final CertificateAuthority certificateAuthority;
 
     @Override
@@ -31,12 +31,12 @@ public class TaskPermissionInterceptor implements HandlerInterceptor {
                 || HttpMethod.PUT.matches(requestHttpMethod)
                 || HttpMethod.DELETE.matches(requestHttpMethod) ) {
             TokenPayload payload = certificateAuthority.decrypt(request.getHeader("x-access-token"));
-            String[] path = taskService.getClass().getSuperclass().toString().split("\\.");
-            String entityName = path[path.length - 1].toLowerCase().replace("service", "");
 
-            Long id = Long.parseLong((String)pathVariables.get(entityName + "Id"));
+            Long id = Long.parseLong((String)pathVariables.get("taskId"));
 
-            Task data = taskService.getById(id);
+            Task data = taskRepository.findById(id)
+                    .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 준비항목입니다."));
+
             if(data.getUser().getId() == payload.getId()) {
                 return true;
             }
