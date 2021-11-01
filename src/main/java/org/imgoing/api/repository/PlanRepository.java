@@ -16,5 +16,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     @Query(value = "SELECT * FROM plan_tb WHERE plan_tb.user_id = :userId", nativeQuery = true)
     List<Plan> findAllByUserId(Long userId);
 
+    List<Plan> findByUserIdAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(Long userId, LocalDateTime now);
+
     Optional<Plan> findTopByUserAndArrivalAtGreaterThanOrderByArrivalAtAsc (User user, LocalDateTime now);
 }

@@ -4,7 +4,8 @@ import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
-import org.imgoing.api.dto.PlanDto;
+import org.imgoing.api.dto.plan.PlanDto;
+import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.dto.route.RemainingTimeResponse;
 import org.imgoing.api.mapper.PlanMapper;
@@ -14,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,10 +29,10 @@ public class PlanController {
     @ApiOperation(value = "일정 생성")
     @PostMapping
     @ApiResponses({
-            @ApiResponse(code = 201, message = "일정 생성 성공", response = PlanDto.class),
+            @ApiResponse(code = 201, message = "일정 생성 성공", response = PlanRequest.class),
             @ApiResponse(code = 400, message = "일정 생성 실패")
     })
-    public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanDto.Create planSaveRequest) {
+    public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanRequest.Create planSaveRequest) {
         Plan plan = planService.createPlan(user, planSaveRequest);
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()), HttpStatus.CREATED);
     }
@@ -41,16 +41,16 @@ public class PlanController {
     @GetMapping
     @ApiResponse(code = 200, message = "일정 전체 조회 성공", response = List.class)
     public ImgoingResponse<List<PlanDto>> getAllPlans(User user) {
-        List<PlanDto> planDtos = planService.getPlansByUser(user).stream()
+        List<PlanDto> planResponses = planService.getPlansByUser(user).stream()
                 .map(plan -> planMapper.toDto(plan, plan.getTaskList()))
                 .collect(Collectors.toList());
 
-        return new ImgoingResponse<>(planDtos, HttpStatus.OK);
+        return new ImgoingResponse<>(planResponses, HttpStatus.OK);
     }
 
     @ApiOperation(value = "일정 조회", notes = "사용자의 특정 일정 조회")
     @GetMapping("/{planId}")
-    @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanDto.class)
+    @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
     public ImgoingResponse<PlanDto> getPlan(
             User user,
             @ApiParam(value = "일정 id", required = true, example = "1")
@@ -63,11 +63,11 @@ public class PlanController {
     @ApiOperation(value = "일정 수정")
     @PutMapping
     @ApiResponses({
-            @ApiResponse(code = 200, message = "일정 수정 성공", response = PlanDto.class),
+            @ApiResponse(code = 200, message = "일정 수정 성공", response = PlanRequest.class),
             @ApiResponse(code = 400, message = "일정 수정 실패")
     })
-    public ImgoingResponse<PlanDto> update (User user, @RequestBody @Valid PlanDto planDto) {
-        Plan plan = planService.updatePlan(user.getId(), planDto);
+    public ImgoingResponse<PlanDto> update (User user, @RequestBody @Valid PlanRequest planRequest) {
+        Plan plan = planService.updatePlan(user.getId(), planRequest);
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
     }
 
