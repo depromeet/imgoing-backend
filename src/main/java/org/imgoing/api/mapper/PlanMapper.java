@@ -2,9 +2,9 @@ package org.imgoing.api.mapper;
 
 import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.domain.entity.User;
+import org.imgoing.api.dto.plan.PlanDto;
 import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.domain.entity.Plan;
-import org.imgoing.api.dto.plan.PlanResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -15,7 +15,7 @@ import java.util.List;
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PlanMapper {
     @Mapping(source = "tasks", target = "task")
-    PlanResponse toResponse(Plan plan, List<Task> tasks);
+    PlanDto toDto(Plan plan, List<Task> tasks);
 
     Plan toEntity(PlanRequest planRequest);
 

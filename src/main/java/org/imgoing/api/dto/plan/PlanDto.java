@@ -15,20 +15,29 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PlanResponse {
+public class PlanDto {
     private Long id;
+
     private String name;
+
     private String departureName;
+
     private Double departureLat;
+
     private Double departureLng;
+
     private String arrivalName;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime arrivalAt;
 
     private Double arrivalLat;
+
     private Double arrivalLng;
+
     private String memo;
+
     private String belongings;
+
     private List<TaskDto> task;
 }
