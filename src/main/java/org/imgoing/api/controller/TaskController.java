@@ -14,6 +14,7 @@ import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,10 +42,11 @@ public class TaskController {
     @GetMapping("/{taskId}")
     public ImgoingResponse<TaskDto> get(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "준비항목 id", required = true, example = "1")
             @PathVariable(value = "taskId") Long id
     ) {
-        Task task = taskService.getById(id);
+        Task task = (Task)httpServletRequest.getAttribute("task");
         TaskDto response = taskMapper.toDto(task);
         return new ImgoingResponse<>(response);
     }
@@ -62,10 +64,11 @@ public class TaskController {
     @DeleteMapping("/{taskId}")
     public ImgoingResponse<String> delete(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "준비항목 id", required = true, example = "1")
             @PathVariable(value = "taskId") Long id
     ) {
-        Task task = Task.builder().id(id).build();
+        Task task = (Task)httpServletRequest.getAttribute("task");
         taskService.delete(task);
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, "준비항목이 삭제되었습니다.");
     }
@@ -74,12 +77,14 @@ public class TaskController {
     @PutMapping("/{taskId}")
     public ImgoingResponse<TaskDto> update (
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "준비항목 id", required = true, example = "1")
             @PathVariable(value = "taskId") Long id,
             @RequestBody @Valid TaskRequest taskRequest
     ) {
-        Task newTask = taskService.update(taskMapper.toEntity(id, user, taskRequest));
-        TaskDto response = taskMapper.toDto(newTask);
+        Task oldTask = (Task)httpServletRequest.getAttribute("task");
+        Task newTask = taskMapper.toEntity(id, user, taskRequest);
+        TaskDto response = taskMapper.toDto(taskService.update(oldTask, newTask));
         return new ImgoingResponse<>(response, HttpStatus.CREATED);
     }
 }

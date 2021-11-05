@@ -50,10 +50,7 @@ public class TaskService {
     }
 
     @Transactional
-    public Task update(Task newTask){
-        Long id = newTask.getId();
-        Task oldTask = getById(id);
-
+    public Task update(Task oldTask, Task newTask){
         oldTask.modifyTask(newTask);
         return taskRepository.save(oldTask);
     }

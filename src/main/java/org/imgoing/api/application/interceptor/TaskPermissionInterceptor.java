@@ -37,6 +37,8 @@ public class TaskPermissionInterceptor implements HandlerInterceptor {
             Task task = taskRepository.findById(id)
                     .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 준비항목입니다."));
 
+            request.setAttribute("task", task);
+
             if(task.getUser().getId() == payload.getId()) return true;
             else throw new ImgoingException(ImgoingError.BAD_REQUEST, "접근할 수 없는 컨텐츠 입니다.");
         } else return true;
