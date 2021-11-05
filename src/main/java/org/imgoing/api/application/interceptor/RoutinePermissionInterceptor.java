@@ -37,6 +37,8 @@ public class RoutinePermissionInterceptor implements HandlerInterceptor {
             Routine routine = routineRepository.findById(id)
                     .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 루틴입니다."));
 
+            request.setAttribute("routine", routine);
+
             if(routine.getUser().getId() == payload.getId()) return true;
             else throw new ImgoingException(ImgoingError.BAD_REQUEST, "접근할 수 없는 컨텐츠 입니다.");
         } else return true;

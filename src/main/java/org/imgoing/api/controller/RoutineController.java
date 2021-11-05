@@ -14,6 +14,7 @@ import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,10 +51,11 @@ public class RoutineController {
     @GetMapping("/{routineId}")
     public ImgoingResponse<RoutineDto> get(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "routineId") Long id
     ) {
-        Routine routine = routineService.getById(id);
+        Routine routine = (Routine)httpServletRequest.getAttribute("routine");
         RoutineDto response = routineMapper.toDto(routine, routine.getRoutinetasks());
         return new ImgoingResponse<>(response, HttpStatus.OK);
     }
@@ -62,10 +64,11 @@ public class RoutineController {
     @DeleteMapping("/{routineId}")
     public ImgoingResponse<String> delete(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "routineId") Long id
     ) {
-        Routine routine = Routine.builder().id(id).build();
+        Routine routine = (Routine)httpServletRequest.getAttribute("routine");
         String responseMessage = "루틴이 삭제되었습니다.";
         routineService.delete(routine);
 
@@ -76,11 +79,16 @@ public class RoutineController {
     @PutMapping("/{routineId}")
     public ImgoingResponse<RoutineDto> update(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "routineId") Long id,
             @RequestBody @Valid RoutineRequest routineRequest){
-        Routine newRoutine = routineService.update(routineMapper.toEntity(id, user, routineRequest), routineRequest.getTaskIdList());
-        RoutineDto response = routineMapper.toDto(newRoutine, newRoutine.getRoutinetasks());
+        Routine oldRoutine = (Routine)httpServletRequest.getAttribute("routine");
+        Routine newRoutine = routineMapper.toEntity(id, user, routineRequest);
+
+        Routine modifiedRoutine = routineService.update(oldRoutine, newRoutine, routineRequest.getTaskIdList());
+        RoutineDto response = routineMapper.toDto(modifiedRoutine, modifiedRoutine.getRoutinetasks());
+
         return new ImgoingResponse<>(response, HttpStatus.CREATED);
     }
 }

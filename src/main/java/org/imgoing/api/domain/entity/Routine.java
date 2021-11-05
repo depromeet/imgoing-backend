@@ -38,7 +38,7 @@ public class Routine extends BaseTime {
     }
 
     public List<Routinetask> getRoutinetasks() {
-        if(routinetasks != null) routinetasks.sort(Comparator.comparing(Routinetask::getPriority));
+        if(!routinetasks.isEmpty()) routinetasks.sort(Comparator.comparing(Routinetask::getPriority));
         return routinetasks;
     }
 
