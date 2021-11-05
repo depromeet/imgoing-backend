@@ -27,20 +27,18 @@ public class RoutinePermissionInterceptor implements HandlerInterceptor {
         String requestHttpMethod = request.getMethod();
         Map<?, ?> pathVariables = (Map<?, ?>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-        if( (HttpMethod.GET.matches(requestHttpMethod) && !pathVariables.isEmpty())
+        if((HttpMethod.GET.matches(requestHttpMethod) && !pathVariables.isEmpty())
                 || HttpMethod.PUT.matches(requestHttpMethod)
-                || HttpMethod.DELETE.matches(requestHttpMethod) ) {
+                || HttpMethod.DELETE.matches(requestHttpMethod)) {
             TokenPayload payload = certificateAuthority.decrypt(request.getHeader("x-access-token"));
 
             Long id = Long.parseLong((String)pathVariables.get("routineId"));
 
-            Routine data = routineRepository.findById(id)
+            Routine routine = routineRepository.findById(id)
                     .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 루틴입니다."));
 
-            if(data.getUser().getId() == payload.getId()) {
-                return true;
-            }
-            throw new ImgoingException(ImgoingError.BAD_REQUEST, "접근할 수 없는 컨텐츠 입니다.");
+            if(routine.getUser().getId() == payload.getId()) return true;
+            else throw new ImgoingException(ImgoingError.BAD_REQUEST, "접근할 수 없는 컨텐츠 입니다.");
         } else return true;
     }
 }
