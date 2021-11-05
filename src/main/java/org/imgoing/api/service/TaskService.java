@@ -50,7 +50,7 @@ public class TaskService {
     }
 
     @Transactional
-    public Task update(Task oldTask, Task newTask){
+    public Task modify(Task oldTask, Task newTask){
         oldTask.modifyTask(newTask);
         return taskRepository.save(oldTask);
     }

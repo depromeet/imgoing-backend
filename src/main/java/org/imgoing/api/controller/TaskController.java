@@ -75,7 +75,7 @@ public class TaskController {
 
     @ApiOperation(value = "준비항목 수정")
     @PutMapping("/{taskId}")
-    public ImgoingResponse<TaskDto> update (
+    public ImgoingResponse<TaskDto> modify(
             User user,
             HttpServletRequest httpServletRequest,
             @ApiParam(value = "준비항목 id", required = true, example = "1")
@@ -84,7 +84,7 @@ public class TaskController {
     ) {
         Task oldTask = (Task)httpServletRequest.getAttribute("task");
         Task newTask = taskMapper.toEntity(id, user, taskRequest);
-        TaskDto response = taskMapper.toDto(taskService.update(oldTask, newTask));
+        TaskDto response = taskMapper.toDto(taskService.modify(oldTask, newTask));
         return new ImgoingResponse<>(response, HttpStatus.CREATED);
     }
 }
