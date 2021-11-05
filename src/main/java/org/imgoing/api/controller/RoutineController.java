@@ -86,7 +86,7 @@ public class RoutineController {
         Routine oldRoutine = (Routine)httpServletRequest.getAttribute("routine");
         Routine newRoutine = routineMapper.toEntity(id, user, routineRequest);
 
-        Routine modifiedRoutine = routineService.update(oldRoutine, newRoutine, routineRequest.getTaskIdList());
+        Routine modifiedRoutine = routineService.modify(oldRoutine, newRoutine, routineRequest.getTaskIdList());
         RoutineDto response = routineMapper.toDto(modifiedRoutine, modifiedRoutine.getRoutinetasks());
 
         return new ImgoingResponse<>(response, HttpStatus.CREATED);

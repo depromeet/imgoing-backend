@@ -37,7 +37,7 @@ public class RoutineService {
     }
 
     @Transactional
-    public Routine update(Routine oldRoutine, Routine newRoutine, List<Long> updateTaskIdList){ // mapper에 의해 새로 생성된 Routine
+    public Routine modify(Routine oldRoutine, Routine newRoutine, List<Long> updateTaskIdList){ // mapper에 의해 새로 생성된 Routine
         oldRoutine.modifyRoutine(newRoutine);
         routineRepository.save(oldRoutine);
 
