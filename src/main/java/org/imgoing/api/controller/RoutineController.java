@@ -5,17 +5,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.Routine;
-import org.imgoing.api.domain.entity.Routinetask;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.routine.RoutineDto;
 import org.imgoing.api.dto.routine.RoutineRequest;
 import org.imgoing.api.mapper.RoutineMapper;
 import org.imgoing.api.service.RoutineService;
-import org.imgoing.api.service.RoutinetaskService;
 import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,8 +25,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/routines")
 public class RoutineController {
     private final RoutineService routineService;
-    private final RoutinetaskService routinetaskService;
-
     private final RoutineMapper routineMapper;
 
     @ApiOperation(value = "루틴 생성")
@@ -54,10 +51,11 @@ public class RoutineController {
     @GetMapping("/{routineId}")
     public ImgoingResponse<RoutineDto> get(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "routineId") Long id
     ) {
-        Routine routine = routineService.getById(id);
+        Routine routine = (Routine)httpServletRequest.getAttribute("routine");
         RoutineDto response = routineMapper.toDto(routine, routine.getRoutinetasks());
         return new ImgoingResponse<>(response, HttpStatus.OK);
     }
@@ -66,11 +64,12 @@ public class RoutineController {
     @DeleteMapping("/{routineId}")
     public ImgoingResponse<String> delete(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "routineId") Long id
     ) {
-        Routine routine = routineService.getById(id);
-        String responseMessage = "루틴 " + routine.getName() + " 이(가) 삭제되었습니다.";
+        Routine routine = (Routine)httpServletRequest.getAttribute("routine");
+        String responseMessage = "루틴이 삭제되었습니다.";
         routineService.delete(routine);
 
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
@@ -80,15 +79,16 @@ public class RoutineController {
     @PutMapping("/{routineId}")
     public ImgoingResponse<RoutineDto> update(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "루틴 id", required = true, example = "1")
             @PathVariable(value = "routineId") Long id,
             @RequestBody @Valid RoutineRequest routineRequest){
-        routineService.update(routineMapper.toEntity(id, user, routineRequest));
+        Routine oldRoutine = (Routine)httpServletRequest.getAttribute("routine");
+        Routine newRoutine = routineMapper.toEntity(id, user, routineRequest);
 
-        Routine routine = routineService.getById(id);
-        List<Routinetask> routinetasks = routinetaskService.update(routine, routineRequest.getTaskIdList());
+        Routine modifiedRoutine = routineService.modify(oldRoutine, newRoutine, routineRequest.getTaskIdList());
+        RoutineDto response = routineMapper.toDto(modifiedRoutine, modifiedRoutine.getRoutinetasks());
 
-        RoutineDto response = routineMapper.toDto(routine, routinetasks);
         return new ImgoingResponse<>(response, HttpStatus.CREATED);
     }
 }

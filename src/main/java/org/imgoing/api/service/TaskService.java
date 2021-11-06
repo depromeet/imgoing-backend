@@ -50,10 +50,7 @@ public class TaskService {
     }
 
     @Transactional
-    public Task update(Task newTask){
-        Long id = newTask.getId();
-        Task oldTask = getById(id);
-
+    public Task modify(Task oldTask, Task newTask){
         oldTask.modifyTask(newTask);
         return taskRepository.save(oldTask);
     }
@@ -67,5 +64,4 @@ public class TaskService {
     public void deleteAll(List<Task> tasks) {
         taskRepository.deleteAll(tasks);
     }
-
 }
