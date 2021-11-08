@@ -39,5 +39,7 @@ public class PlanDto {
 
     private String belongings;
 
+    private Boolean isImportant;
+
     private List<TaskDto> task;
 }

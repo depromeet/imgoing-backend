@@ -1,6 +1,7 @@
 package org.imgoing.api.domain.entity;
 
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 import org.imgoing.api.config.BaseTime;
 
 import javax.persistence.*;
@@ -10,11 +11,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicInsert
 @Table(name="plan_tb")
 public class Plan extends BaseTime {
     @Id
@@ -52,6 +53,11 @@ public class Plan extends BaseTime {
     @Column
     private String belongings;
 
+    // @Column(nullable = false, columnDefinition = "boolean default false")
+    // private Boolean isImportant = false;
+    @Column
+    private Boolean isImportant;
+
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
@@ -79,7 +85,7 @@ public class Plan extends BaseTime {
         return plantasks.stream().map(Plantask::getTask).collect(Collectors.toList());
     }
 
-    public void updatePlan(Plan newPlan) {
+    public void modify(Plan newPlan) {
         this.name = newPlan.getName();
         this.departureName = newPlan.getDepartureName();
         this.departureLat = newPlan.getDepartureLat();
@@ -90,5 +96,15 @@ public class Plan extends BaseTime {
         this.arrivalAt = newPlan.getArrivalAt();
         this.memo = newPlan.getMemo();
         this.belongings = newPlan.getBelongings();
+    }
+
+    public Boolean modifyImportantStatus() {
+        this.isImportant = !this.isImportant;
+        return this.isImportant;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.isImportant = this.isImportant == null ? false : this.isImportant;
     }
 }

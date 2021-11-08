@@ -4,6 +4,7 @@ import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
+import org.imgoing.api.dto.plan.PlanBookmarkDto;
 import org.imgoing.api.dto.plan.PlanDto;
 import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.domain.entity.Plan;
@@ -33,15 +34,15 @@ public class PlanController {
             @ApiResponse(code = 400, message = "일정 생성 실패")
     })
     public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanRequest.Create planSaveRequest) {
-        Plan plan = planService.createPlan(user, planSaveRequest);
+        Plan plan = planService.create(user, planSaveRequest);
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "일정 전체 조회", notes = "사용자의 전체 일정 조회")
     @GetMapping
     @ApiResponse(code = 200, message = "일정 전체 조회 성공", response = List.class)
-    public ImgoingResponse<List<PlanDto>> getAllPlans(User user) {
-        List<PlanDto> planResponses = planService.getPlansByUser(user).stream()
+    public ImgoingResponse<List<PlanDto>> getAll(User user) {
+        List<PlanDto> planResponses = planService.getAll(user).stream()
                 .map(plan -> planMapper.toDto(plan, plan.getTaskList()))
                 .collect(Collectors.toList());
 
@@ -51,12 +52,12 @@ public class PlanController {
     @ApiOperation(value = "일정 조회", notes = "사용자의 특정 일정 조회")
     @GetMapping("/{planId}")
     @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
-    public ImgoingResponse<PlanDto> getPlan(
+    public ImgoingResponse<PlanDto> getOne(
             User user,
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long planId
     ) {
-        Plan plan = planService.getPlan(user.getId(), planId);
+        Plan plan = planService.getOne(user.getId(), planId);
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
     }
 
@@ -66,8 +67,8 @@ public class PlanController {
             @ApiResponse(code = 200, message = "일정 수정 성공", response = PlanRequest.class),
             @ApiResponse(code = 400, message = "일정 수정 실패")
     })
-    public ImgoingResponse<PlanDto> update (User user, @RequestBody @Valid PlanRequest planRequest) {
-        Plan plan = planService.updatePlan(user.getId(), planRequest);
+    public ImgoingResponse<PlanDto> modify (User user, @RequestBody @Valid PlanRequest planRequest) {
+        Plan plan = planService.modify(user.getId(), planRequest);
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
     }
 
@@ -79,9 +80,31 @@ public class PlanController {
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long planId
     ) {
-        planService.deletePlan(user.getId(), planId);
+        planService.delete(user.getId(), planId);
         String responseMessage = "planId = " + planId + "일정이 삭제되었습니다.";
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
+    }
+
+    @ApiOperation(value = "중요 일정 등록/삭제")
+    @PostMapping("/bookmark/{planId}")
+    @ApiResponse(code = 200, message = "중요 일정 등록/삭제 성공", response = PlanBookmarkDto.class)
+    public ImgoingResponse<PlanBookmarkDto> registerImportant(
+            User user,
+            @ApiParam(value = "일정 id", required = true, example = "1")
+            @PathVariable(value = "planId") Long planId
+    ){
+        return new ImgoingResponse<>(planService.registerImportant(planId), HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "중요 일정 조회")
+    @GetMapping("/bookmark")
+    @ApiResponse(code = 200, message = "중요 일정 조회 성공")
+    public ImgoingResponse<List<PlanDto>> getImportantList(User user) {
+        List<PlanDto> planResponses = planService.getImportantList(user.getId()).stream()
+                .map(plan -> planMapper.toDto(plan, plan.getTaskList()))
+                .collect(Collectors.toList());
+
+        return new ImgoingResponse<>(planResponses, HttpStatus.OK);
     }
 
     @ApiOperation(value = "가장 최근 약속까지 남은 시간")

@@ -18,5 +18,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
 
     List<Plan> findByUserIdAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(Long userId, LocalDateTime now);
 
+    List<Plan> findByUserIdAndIsImportant(Long userId, Boolean isImportant);
+
     Optional<Plan> findTopByUserAndArrivalAtGreaterThanOrderByArrivalAtAsc (User user, LocalDateTime now);
 }

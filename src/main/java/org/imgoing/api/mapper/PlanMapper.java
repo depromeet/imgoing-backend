@@ -7,6 +7,7 @@ import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.domain.entity.Plan;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
