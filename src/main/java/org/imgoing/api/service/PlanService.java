@@ -31,15 +31,13 @@ public class PlanService {
     private final PlantaskRepository plantaskRepository;
     private final TaskService taskService;
     private final PlantaskService plantaskService;
-    private final PlanMapper planMapper;
     private final TaskMapper taskMapper;
     private final RouteSearcher routeSearcher;
 
     @Transactional
-    public Plan create(User user, PlanRequest.Create planSaveRequest) {
-        Plan savedPlan = planRepository.save(planMapper.toEntityForSave(user, planSaveRequest));
-        List<TaskDto> taskDtos = planSaveRequest.getTask();
-        List<Long> bookmarkedTaskIds = planSaveRequest.getBookmarkedTaskIds();
+    public Plan create(Plan newPlan, List<TaskDto> taskDtos, List<Long> bookmarkedTaskIds) {
+        Plan savedPlan = planRepository.save(newPlan);
+
         if (taskDtos.isEmpty() && bookmarkedTaskIds.isEmpty()) {
             savedPlan.registerPlantasks(new ArrayList<>());
             return savedPlan;
@@ -68,12 +66,9 @@ public class PlanService {
     }
 
     @Transactional
-    public Plan modify(Plan oldPlan, PlanRequest planRequest) {
-        Plan newPlan = planMapper.toEntity(planRequest);
+    public Plan modify(Plan oldPlan, Plan newPlan, List<TaskDto> taskDtos) {
         oldPlan.modify(newPlan);
         Plan modifiedPlan = planRepository.save(oldPlan);
-
-        List<TaskDto> taskDtos = planRequest.getTask();
 
         // TODO: 로직 수정
 
@@ -110,12 +105,6 @@ public class PlanService {
         deleteNotBookmarkedTask(plan);
 
         planRepository.delete(plan);
-    }
-
-    @Transactional(readOnly = true)
-    public Plan getById(Long planId) {
-        return planRepository.findById(planId)
-                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 일정입니다."));
     }
 
     // 북마크가 아닌 task 삭제

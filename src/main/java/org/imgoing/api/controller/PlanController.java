@@ -35,7 +35,8 @@ public class PlanController {
             @ApiResponse(code = 400, message = "일정 생성 실패")
     })
     public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanRequest.Create planSaveRequest) {
-        Plan plan = planService.create(user, planSaveRequest);
+        Plan newPlan = planMapper.toEntityForSave(user, planSaveRequest);
+        Plan plan = planService.create(newPlan, planSaveRequest.getTask(), planSaveRequest.getBookmarkedTaskIds());
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()), HttpStatus.CREATED);
     }
 
@@ -54,7 +55,6 @@ public class PlanController {
     @GetMapping("/{planId}")
     @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
     public ImgoingResponse<PlanDto> getOne(
-            User user,
             HttpServletRequest httpServletRequest,
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long planId
@@ -70,22 +70,21 @@ public class PlanController {
             @ApiResponse(code = 400, message = "일정 수정 실패")
     })
     public ImgoingResponse<PlanDto> modify (
-            User user,
             HttpServletRequest httpServletRequest,
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long planId,
             @RequestBody @Valid PlanRequest planRequest
     ) {
         Plan oldPlan = (Plan)httpServletRequest.getAttribute("plan");
-        Plan plan = planService.modify(oldPlan, planRequest);
-        return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
+        Plan newPlan = planMapper.toEntity(planRequest);
+        Plan modifiedplan = planService.modify(oldPlan, newPlan, planRequest.getTask());
+        return new ImgoingResponse<>(planMapper.toDto(modifiedplan, modifiedplan.getTaskList()));
     }
 
     @ApiOperation(value = "일정 삭제")
     @DeleteMapping("/{planId}")
     @ApiResponse(code = 204, message = "일정 삭제 성공", response = String.class)
     public ImgoingResponse<String> delete(
-            User user,
             HttpServletRequest httpServletRequest,
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long planId
@@ -99,7 +98,6 @@ public class PlanController {
     @PostMapping("/important/{planId}")
     @ApiResponse(code = 200, message = "중요 일정 등록/삭제 성공", response = ImportantPlanDto.class)
     public ImgoingResponse<ImportantPlanDto> registerImportant(
-            User user,
             HttpServletRequest httpServletRequest,
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long planId
