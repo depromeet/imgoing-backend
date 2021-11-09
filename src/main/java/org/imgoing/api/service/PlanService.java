@@ -81,7 +81,7 @@ public class PlanService {
         plantaskService.deleteByPlanId(modifiedPlan.getId());
 
         // 기존 task 삭제
-        deleteTask(modifiedPlan);
+        deleteNotBookmarkedTask(modifiedPlan);
 
         List<Task> tasks = new ArrayList<>();
 
@@ -107,7 +107,7 @@ public class PlanService {
     @Transactional
     public void delete(Plan plan) {
         // task 삭제
-        deleteTask(plan);
+        deleteNotBookmarkedTask(plan);
 
         planRepository.delete(plan);
     }
@@ -120,7 +120,7 @@ public class PlanService {
 
     // 북마크가 아닌 task 삭제
     @Transactional
-    public void deleteTask(Plan plan) {
+    public void deleteNotBookmarkedTask(Plan plan) {
         List<Task> tasks = plan.getTaskList().stream()
                 .filter(task -> !task.getIsBookmarked())
                 .collect(Collectors.toList());
