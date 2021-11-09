@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlanBookmarkDto {
+public class ImportantPlanDto {
     private Long id;
     private Boolean isImportant;
 }
