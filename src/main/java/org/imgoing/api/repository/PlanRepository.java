@@ -13,12 +13,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface PlanRepository extends JpaRepository<Plan, Long> {
-    @Query(value = "SELECT * FROM plan_tb WHERE plan_tb.user_id = :userId", nativeQuery = true)
-    List<Plan> findAllByUserId(Long userId);
-
     List<Plan> findByUserIdAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(Long userId, LocalDateTime now);
 
-    List<Plan> findByUserIdAndIsImportant(Long userId, Boolean isImportant);
+    List<Plan> findByUserIdAndIsImportantOrderByArrivalAtAsc(Long userId, Boolean isImportant);
 
     Optional<Plan> findTopByUserAndArrivalAtGreaterThanOrderByArrivalAtAsc (User user, LocalDateTime now);
 }

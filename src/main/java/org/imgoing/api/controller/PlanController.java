@@ -4,7 +4,7 @@ import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
-import org.imgoing.api.dto.plan.PlanBookmarkDto;
+import org.imgoing.api.dto.plan.ImportantPlanDto;
 import org.imgoing.api.dto.plan.PlanDto;
 import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.domain.entity.Plan;
@@ -15,6 +15,7 @@ import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,21 +55,29 @@ public class PlanController {
     @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
     public ImgoingResponse<PlanDto> getOne(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long planId
     ) {
-        Plan plan = planService.getOne(user.getId(), planId);
+        Plan plan = (Plan)httpServletRequest.getAttribute("plan");
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
     }
 
     @ApiOperation(value = "일정 수정")
-    @PutMapping
+    @PutMapping("/{planId}")
     @ApiResponses({
             @ApiResponse(code = 200, message = "일정 수정 성공", response = PlanRequest.class),
             @ApiResponse(code = 400, message = "일정 수정 실패")
     })
-    public ImgoingResponse<PlanDto> modify (User user, @RequestBody @Valid PlanRequest planRequest) {
-        Plan plan = planService.modify(user.getId(), planRequest);
+    public ImgoingResponse<PlanDto> modify (
+            User user,
+            HttpServletRequest httpServletRequest,
+            @ApiParam(value = "일정 id", required = true, example = "1")
+            @PathVariable(value = "planId") Long planId,
+            @RequestBody @Valid PlanRequest planRequest
+    ) {
+        Plan oldPlan = (Plan)httpServletRequest.getAttribute("plan");
+        Plan plan = planService.modify(oldPlan, planRequest);
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
     }
 
@@ -77,23 +86,26 @@ public class PlanController {
     @ApiResponse(code = 204, message = "일정 삭제 성공", response = String.class)
     public ImgoingResponse<String> delete(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long planId
     ) {
-        planService.delete(user.getId(), planId);
+        planService.delete((Plan)httpServletRequest.getAttribute("plan"));
         String responseMessage = "planId = " + planId + "일정이 삭제되었습니다.";
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
 
     @ApiOperation(value = "중요 일정 등록/삭제")
     @PostMapping("/bookmark/{planId}")
-    @ApiResponse(code = 200, message = "중요 일정 등록/삭제 성공", response = PlanBookmarkDto.class)
-    public ImgoingResponse<PlanBookmarkDto> registerImportant(
+    @ApiResponse(code = 200, message = "중요 일정 등록/삭제 성공", response = ImportantPlanDto.class)
+    public ImgoingResponse<ImportantPlanDto> registerImportant(
             User user,
+            HttpServletRequest httpServletRequest,
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long planId
     ){
-        return new ImgoingResponse<>(planService.registerImportant(planId), HttpStatus.OK);
+        Plan plan = (Plan)httpServletRequest.getAttribute("plan");
+        return new ImgoingResponse<>(planService.registerImportant(plan.getId()), HttpStatus.OK);
     }
 
     @ApiOperation(value = "중요 일정 조회")

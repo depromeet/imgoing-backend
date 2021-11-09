@@ -1,10 +1,9 @@
 package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.imgoing.api.domain.entity.*;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
-import org.imgoing.api.dto.plan.PlanBookmarkDto;
+import org.imgoing.api.dto.plan.ImportantPlanDto;
 import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.dto.route.RouteSearchRequest;
 import org.imgoing.api.dto.task.TaskDto;
@@ -68,39 +67,28 @@ public class PlanService {
         return planRepository.findByUserIdAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(user.getId(), now);
     }
 
-    @Transactional(readOnly = true)
-    public Plan getOne(Long userId, Long planId) {
-        Plan plan = getById(planId);
-        validateAuthorizedUser(userId, plan);
-        return plan;
-    }
-
     @Transactional
-    public Plan modify(Long userId, PlanRequest planRequest) {
-        // intercepter에서 가져와서 쓰고있어
-
-        Plan plan = getById(planRequest.getId()); // oldPlan
-        validateAuthorizedUser(userId, plan);
-
+    public Plan modify(Plan oldPlan, PlanRequest planRequest) {
         Plan newPlan = planMapper.toEntity(planRequest);
-        plan.modify(newPlan);
+        oldPlan.modify(newPlan);
+        Plan modifiedPlan = planRepository.save(oldPlan);
 
         List<TaskDto> taskDtos = planRequest.getTask();
 
         // TODO: 로직 수정
 
         // 기존 plantask  삭제
-        plantaskService.deleteByPlanId(plan.getId());
+        plantaskService.deleteByPlanId(modifiedPlan.getId());
 
         // 기존 task 삭제
-        deleteTask(plan);
+        deleteTask(modifiedPlan);
 
         List<Task> tasks = new ArrayList<>();
 
         // 준비항목이 없는 경우
         if(taskDtos.size() == 0) {
-            plan.registerPlantask(tasks);
-            return plan;
+            modifiedPlan.registerPlantask(tasks);
+            return modifiedPlan;
         }
 
         // 북마크가 아닌 준비항목은 task db에 저장
@@ -108,19 +96,16 @@ public class PlanService {
 
         // plantask 등록
         tasks.addAll(findBookmarkedTask(taskDtos));
-        plan.registerPlantask(tasks);
+        modifiedPlan.registerPlantask(tasks);
 
         // plantask db 저장
-        plantaskService.saveAll(plan.getPlantasks());
+        plantaskService.saveAll(modifiedPlan.getPlantasks());
 
-        return plan;
+        return modifiedPlan;
     }
 
     @Transactional
-    public void delete(Long userId, Long planId) {
-        Plan plan = getById(planId);
-        validateAuthorizedUser(userId, plan);
-        
+    public void delete(Plan plan) {
         // task 삭제
         deleteTask(plan);
 
@@ -143,21 +128,13 @@ public class PlanService {
     }
 
     @Transactional
-    public PlanBookmarkDto registerImportant(Long planId) {
-        return new PlanBookmarkDto(planId, planRepository.getById(planId).modifyImportantStatus());
+    public ImportantPlanDto registerImportant(Long planId) {
+        return new ImportantPlanDto(planId, planRepository.getById(planId).modifyImportantStatus());
     }
 
     @Transactional(readOnly = true)
     public List<Plan> getImportantList(Long userId) {
-        return planRepository.findByUserIdAndIsImportant(userId, true);
-    }
-
-    // plan의 작성자와 현재 로그인한 사용자가 일치하는지 확인하는 함수
-    public void validateAuthorizedUser(Long accessUserId, Plan plan) {
-        long userId = plan.getUser().getId();
-        if(accessUserId != userId) {
-            throw new ImgoingException(ImgoingError.NOT_PERMITTED);
-        }
+        return planRepository.findByUserIdAndIsImportantOrderByArrivalAtAsc(userId, true);
     }
 
     public List<Task> findNotBookmarkedTask (List<TaskDto> taskDtos) {
