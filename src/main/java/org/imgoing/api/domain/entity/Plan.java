@@ -53,8 +53,6 @@ public class Plan extends BaseTime {
     @Column
     private String belongings;
 
-    // @Column(nullable = false, columnDefinition = "boolean default false")
-    // private Boolean isImportant = false;
     @Column
     private Boolean isImportant;
 
