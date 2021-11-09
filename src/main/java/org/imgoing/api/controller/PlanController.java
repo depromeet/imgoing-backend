@@ -96,7 +96,7 @@ public class PlanController {
     }
 
     @ApiOperation(value = "중요 일정 등록/삭제")
-    @PostMapping("/bookmark/{planId}")
+    @PostMapping("/important/{planId}")
     @ApiResponse(code = 200, message = "중요 일정 등록/삭제 성공", response = ImportantPlanDto.class)
     public ImgoingResponse<ImportantPlanDto> registerImportant(
             User user,
@@ -109,7 +109,7 @@ public class PlanController {
     }
 
     @ApiOperation(value = "중요 일정 조회")
-    @GetMapping("/bookmark")
+    @GetMapping("/important")
     @ApiResponse(code = 200, message = "중요 일정 조회 성공")
     public ImgoingResponse<List<PlanDto>> getImportantList(User user) {
         List<PlanDto> planResponses = planService.getImportantList(user.getId()).stream()
