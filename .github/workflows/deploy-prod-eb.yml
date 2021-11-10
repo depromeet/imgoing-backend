@@ -2,7 +2,7 @@ name: Deploy to Production EB
 
 on:
   push:
-    branches: [ main, deploy-to-prod ]
+    branches: [ main, feature/deploy-to-prod ]
 
 jobs:
   build:
