@@ -35,7 +35,7 @@ public class PlanController {
             @ApiResponse(code = 400, message = "일정 생성 실패")
     })
     public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanRequest.Create planSaveRequest) {
-        Plan newPlan = planMapper.toEntityForSave(user, planSaveRequest);
+        Plan newPlan = planMapper.toEntity(user, planSaveRequest);
         Plan plan = planService.create(newPlan, planSaveRequest.getTask(), planSaveRequest.getBookmarkedTaskIds());
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()), HttpStatus.CREATED);
     }
