@@ -61,7 +61,7 @@ public class RoutinetaskService {
         for(int i = 0; i < updateTaskIdList.size(); ++i) {
             for(Routinetask rt : updateList) {
                 if(updateTaskIdList.get(i).equals(rt.getTask().getId())) {
-                    rt.addPriority(i);
+                    rt.addSequence(i);
                     routinetasks.add(rt);
                     updateList.remove(rt);
                     break;

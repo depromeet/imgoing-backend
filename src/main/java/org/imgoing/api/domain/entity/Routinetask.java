@@ -30,9 +30,9 @@ public class Routinetask extends BaseTime {
     private Task task;
 
     @Column(nullable = false)
-    private Integer priority;
+    private Integer sequence;
 
-    public void addPriority(Integer priority) {
-        this.priority = priority;
+    public void addSequence(Integer sequence) {
+        this.sequence = sequence;
     }
 }
