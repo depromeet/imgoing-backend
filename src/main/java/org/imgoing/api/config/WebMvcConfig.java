@@ -1,6 +1,7 @@
 package org.imgoing.api.config;
 
 import lombok.RequiredArgsConstructor;
+import org.imgoing.api.application.interceptor.PlanPermissionInterceptor;
 import org.imgoing.api.application.interceptor.RoutinePermissionInterceptor;
 import org.imgoing.api.application.interceptor.TaskPermissionInterceptor;
 import org.imgoing.api.application.resolver.UserArgumentResolver;
@@ -18,6 +19,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final UserArgumentResolver userArgumentResolver;
     private final TaskPermissionInterceptor taskPermissionInterceptor;
     private final RoutinePermissionInterceptor routinePermissionInterceptor;
+    private final PlanPermissionInterceptor planPermissionInterceptor;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -33,5 +35,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(taskPermissionInterceptor).addPathPatterns("/api/v1/tasks/**");
         registry.addInterceptor(routinePermissionInterceptor).addPathPatterns("/api/v1/routines/**");
+        registry.addInterceptor(planPermissionInterceptor).addPathPatterns("/api/v1/plans/**");
     }
 }

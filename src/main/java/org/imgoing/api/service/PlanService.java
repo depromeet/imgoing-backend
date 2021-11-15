@@ -1,9 +1,9 @@
 package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.imgoing.api.domain.entity.*;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
+import org.imgoing.api.dto.plan.ImportantPlanDto;
 import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.dto.route.RouteSearchRequest;
 import org.imgoing.api.dto.task.TaskDto;
@@ -31,16 +31,13 @@ public class PlanService {
     private final PlantaskRepository plantaskRepository;
     private final TaskService taskService;
     private final PlantaskService plantaskService;
-    private final PlanMapper planMapper;
     private final TaskMapper taskMapper;
     private final RouteSearcher routeSearcher;
 
     @Transactional
-    public Plan createPlan(User user, PlanRequest.Create planSaveRequest) {
-        Plan savedPlan = planRepository.save(planMapper.toEntityForSave(user, planSaveRequest));
+    public Plan create(Plan newPlan, List<TaskDto> taskDtos, List<Long> bookmarkedTaskIds) {
+        Plan savedPlan = planRepository.save(newPlan);
 
-        List<TaskDto> taskDtos = planSaveRequest.getTask();
-        List<Long> bookmarkedTaskIds = planSaveRequest.getBookmarkedTaskIds();
         if (taskDtos.isEmpty() && bookmarkedTaskIds.isEmpty()) {
             savedPlan.registerPlantasks(new ArrayList<>());
             return savedPlan;
@@ -63,43 +60,30 @@ public class PlanService {
     }
 
     @Transactional(readOnly = true)
-    public List<Plan> getPlansByUser(User user) {
+    public List<Plan> getAll(User user) {
         LocalDateTime now = LocalDateTime.now();
         return planRepository.findByUserIdAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(user.getId(), now);
     }
 
-    @Transactional(readOnly = true)
-    public Plan getPlan(Long userId, Long planId) {
-        Plan plan = getPlanById(planId);
-        validateAuthorizedUser(userId, plan);
-
-        return plan;
-    }
-
     @Transactional
-    public Plan updatePlan(Long userId, PlanRequest planRequest) {
-        Plan plan = getPlanById(planRequest.getId()); // oldPlan
-        validateAuthorizedUser(userId, plan);
-
-        Plan newPlan = planMapper.toEntity(planRequest);
-        plan.updatePlan(newPlan);
-
-        List<TaskDto> taskDtos = planRequest.getTask();
+    public Plan modify(Plan oldPlan, Plan newPlan, List<TaskDto> taskDtos) {
+        oldPlan.modify(newPlan);
+        Plan modifiedPlan = planRepository.save(oldPlan);
 
         // TODO: 로직 수정
 
         // 기존 plantask  삭제
-        plantaskService.deleteByPlanId(plan.getId());
+        plantaskService.deleteByPlanId(modifiedPlan.getId());
 
         // 기존 task 삭제
-        deleteTask(plan);
+        deleteNotBookmarkedTask(modifiedPlan);
 
         List<Task> tasks = new ArrayList<>();
 
         // 준비항목이 없는 경우
         if(taskDtos.size() == 0) {
-            plan.registerPlantask(tasks);
-            return plan;
+            modifiedPlan.registerPlantask(tasks);
+            return modifiedPlan;
         }
 
         // 북마크가 아닌 준비항목은 task db에 저장
@@ -107,46 +91,39 @@ public class PlanService {
 
         // plantask 등록
         tasks.addAll(findBookmarkedTask(taskDtos));
-        plan.registerPlantask(tasks);
+        modifiedPlan.registerPlantask(tasks);
 
         // plantask db 저장
-        plantaskService.saveAll(plan.getPlantasks());
+        plantaskService.saveAll(modifiedPlan.getPlantasks());
 
-        return plan;
+        return modifiedPlan;
     }
 
     @Transactional
-    public void deletePlan(Long userId, Long planId) {
-        Plan plan = getPlanById(planId);
-        validateAuthorizedUser(userId, plan);
-        
+    public void delete(Plan plan) {
         // task 삭제
-        deleteTask(plan);
+        deleteNotBookmarkedTask(plan);
 
         planRepository.delete(plan);
     }
 
-    @Transactional(readOnly = true)
-    public Plan getPlanById(Long planId) {
-        return planRepository.findById(planId)
-                .orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "존재하지 않는 일정입니다."));
-    }
-
     // 북마크가 아닌 task 삭제
     @Transactional
-    public void deleteTask(Plan plan) {
+    public void deleteNotBookmarkedTask(Plan plan) {
         List<Task> tasks = plan.getTaskList().stream()
                 .filter(task -> !task.getIsBookmarked())
                 .collect(Collectors.toList());
         taskService.deleteAll(tasks);
     }
 
-    // plan의 작성자와 현재 로그인한 사용자가 일치하는지 확인하는 함수
-    public void validateAuthorizedUser(Long accessUserId, Plan plan) {
-        long userId = plan.getUser().getId();
-        if(accessUserId != userId) {
-            throw new ImgoingException(ImgoingError.NOT_PERMITTED);
-        }
+    @Transactional
+    public ImportantPlanDto registerImportant(Long planId) {
+        return new ImportantPlanDto(planId, planRepository.getById(planId).modifyImportantStatus());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Plan> getImportantList(Long userId) {
+        return planRepository.findByUserIdAndIsImportantOrderByArrivalAtAsc(userId, true);
     }
 
     public List<Task> findNotBookmarkedTask (List<TaskDto> taskDtos) {
