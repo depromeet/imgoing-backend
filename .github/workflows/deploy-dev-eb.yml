@@ -24,7 +24,7 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ${{ secrets.CONFIG_BUCKET }}/application-dev.yml src/main/resources/application.yml
+            ${{ secrets.CONFIG_BUCKET }}/application-dev.yml Imgoing-api/src/main/resources/application.yml
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
