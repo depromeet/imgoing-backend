@@ -2,7 +2,7 @@ name: Deploy to Test EB
 
 on:
   push:
-    branches: [ develop, feature/multi-module ]
+    branches: [ develop ]
 
 jobs:
   build:
