@@ -24,7 +24,7 @@ jobs:
         run: |
           aws s3 cp \
             --region ap-northeast-2 \
-            ${{ secrets.CONFIG_BUCKET }}/application-dev.yml src/main/resources/application.yml
+            ${{ secrets.CONFIG_BUCKET }}/application-dev.yml Imgoing-api/src/main/resources/application.yml
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -44,7 +44,7 @@ jobs:
       - name: Generate deployment package
         run: |
           mkdir -p deploy
-          cp build/libs/*.jar deploy/application.jar
+          cp ./Imgoing-api/build/libs/Imgoing-api.jar deploy/application.jar
           cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform

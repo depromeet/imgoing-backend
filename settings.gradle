@@ -1,1 +1,5 @@
-rootProject.name = 'api'
+rootProject.name = 'Imgoing'
+include 'Imgoing-api'
+include 'Imgoing-batch'
+include 'Imgoing-push'
+
