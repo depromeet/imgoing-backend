@@ -2,7 +2,7 @@ name: Deploy to Test EB
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, feature/multi-module ]
 
 jobs:
   build:
@@ -43,6 +43,7 @@ jobs:
 
       - name: Generate deployment package
         run: |
+          cd Imgoing-api
           mkdir -p deploy
           cp build/libs/*.jar deploy/application.jar
           cp Procfile deploy/Procfile

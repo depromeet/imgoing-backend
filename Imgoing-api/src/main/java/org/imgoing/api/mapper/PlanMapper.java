@@ -11,8 +11,11 @@ import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses=TaskMapper.class
+)
 public interface PlanMapper {
     @Mapping(source = "tasks", target = "task")
     PlanDto toDto(Plan plan, List<Task> tasks);
