@@ -8,6 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface TaskMapper {
@@ -24,6 +26,10 @@ public interface TaskMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "routinetasks", ignore = true)
     Task toEntity(TaskDto taskDto);
+
+    @Mapping(target = "user", source = "user")
+    @Mapping(target = "routinetasks", ignore = true)
+    List<Task> toEntity(List<TaskDto> taskDtos);
 
     TaskDto toDto(Task task);
 }

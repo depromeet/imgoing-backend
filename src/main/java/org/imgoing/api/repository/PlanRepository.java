@@ -15,7 +15,5 @@ import java.util.Optional;
 public interface PlanRepository extends JpaRepository<Plan, Long> {
     List<Plan> findByUserIdAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(Long userId, LocalDateTime now);
 
-    List<Plan> findByUserIdAndIsImportantOrderByArrivalAtAsc(Long userId, Boolean isImportant);
-
     Optional<Plan> findTopByUserAndArrivalAtGreaterThanOrderByArrivalAtAsc (User user, LocalDateTime now);
 }

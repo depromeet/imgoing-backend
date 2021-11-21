@@ -1,6 +1,7 @@
 package org.imgoing.api.application.interceptor;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.imgoing.api.domain.entity.CertificateAuthority;
 import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.domain.vo.TokenPayload;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PlanPermissionInterceptor implements HandlerInterceptor {

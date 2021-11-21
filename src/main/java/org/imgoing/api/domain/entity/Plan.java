@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@ToString
 @Getter
 @Entity
 @Builder
@@ -53,9 +54,6 @@ public class Plan extends BaseTime {
     @Column
     private String belongings;
 
-    @Column
-    private Boolean isImportant;
-
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
@@ -63,15 +61,18 @@ public class Plan extends BaseTime {
     @OneToMany(mappedBy = "plan", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Plantask> plantasks = new ArrayList<>();
 
-    public void registerPlantask(List<Task> tasks) {
+    public List<Plantask> modifyPlantasks(List<Task> tasks) {
         this.plantasks.clear();
-        List<Plantask> plantasks = tasks.stream()
-                .map(task -> Plantask.builder()
-                        .plan(this)
-                        .task(task)
-                        .build()
-                ).collect(Collectors.toList());
-        this.plantasks.addAll(plantasks);
+        for(int i = 0; i < tasks.size(); i++) {
+            this.plantasks.add(
+                    Plantask.builder()
+                            .plan(this)
+                            .task(tasks.get(i))
+                            .sequence(i + 1)
+                            .build()
+                    );
+        }
+        return this.plantasks;
     }
 
     // plantask 새로 추가
@@ -94,15 +95,5 @@ public class Plan extends BaseTime {
         this.arrivalAt = newPlan.getArrivalAt();
         this.memo = newPlan.getMemo();
         this.belongings = newPlan.getBelongings();
-    }
-
-    public Boolean modifyImportantStatus() {
-        this.isImportant = !this.isImportant;
-        return this.isImportant;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        this.isImportant = this.isImportant == null ? false : this.isImportant;
     }
 }

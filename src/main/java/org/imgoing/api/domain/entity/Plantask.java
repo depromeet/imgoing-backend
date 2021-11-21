@@ -6,7 +6,6 @@ import org.imgoing.api.config.BaseTime;
 import javax.persistence.*;
 
 @Getter
-@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -25,6 +24,9 @@ public class Plantask extends BaseTime {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "taskId", referencedColumnName = "id")
     private Task task;
+
+    @Column(nullable = false)
+    private Integer sequence;
 
     public void setPlanTask(Plan plan, Task task) {
         this.plan = plan;

@@ -14,4 +14,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findAllByUserIdAndIsBookmarked(Long userId);
 
     List<Task> findAllByIdIn(List<Long> taskIds);
+
+    void deleteByIdIn(List<Long> taskIds);
 }

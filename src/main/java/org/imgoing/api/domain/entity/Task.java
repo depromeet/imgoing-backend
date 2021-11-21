@@ -28,7 +28,7 @@ public class Task extends BaseTime {
     @Column(nullable = false)
     private Integer time;
 
-    @Column(nullable = false)
+    // @Column(nullable = false)
     private Boolean isBookmarked;
 
     @ManyToOne
@@ -42,6 +42,6 @@ public class Task extends BaseTime {
     public void modifyTask(Task newTask) {
         this.name = newTask.getName();
         this.time = newTask.getTime();
-        this.isBookmarked = newTask.getIsBookmarked();
+//        this.isBookmarked = newTask.getIsBookmarked();
     }
 }

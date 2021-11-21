@@ -66,15 +66,4 @@ public class PlanRequest {
 
     @ApiModelProperty(value = "준비항목")
     private List<TaskDto> task;
-
-    @SuperBuilder
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @ApiModel(value = "플랜 생성 모델")
-    public static class Create extends PlanRequest {
-        @ApiModelProperty(value = "북마크 리스트")
-        private List<Long> bookmarkedTaskIds;
-    }
 }

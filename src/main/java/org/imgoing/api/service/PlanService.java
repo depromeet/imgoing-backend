@@ -3,11 +3,7 @@ package org.imgoing.api.service;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.*;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
-import org.imgoing.api.dto.plan.ImportantPlanDto;
-import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.dto.route.RouteSearchRequest;
-import org.imgoing.api.dto.task.TaskDto;
-import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.mapper.TaskMapper;
 import org.imgoing.api.repository.PlanRepository;
 import org.imgoing.api.repository.PlantaskRepository;
@@ -29,33 +25,41 @@ public class PlanService {
     private final PlanRepository planRepository;
     private final TaskRepository taskRepository;
     private final PlantaskRepository plantaskRepository;
-    private final TaskService taskService;
     private final PlantaskService plantaskService;
-    private final TaskMapper taskMapper;
     private final RouteSearcher routeSearcher;
 
     @Transactional
-    public Plan create(Plan newPlan, List<TaskDto> taskDtos, List<Long> bookmarkedTaskIds) {
+    public Plan create(User user, Plan newPlan, List<Task> newTasks) {
         Plan savedPlan = planRepository.save(newPlan);
 
-        if (taskDtos.isEmpty() && bookmarkedTaskIds.isEmpty()) {
+        if (newTasks.isEmpty()) {
             savedPlan.registerPlantasks(new ArrayList<>());
             return savedPlan;
         }
 
-        List<Task> bookmarkedTasks = taskRepository.findAllByIdIn(bookmarkedTaskIds);
-        List<Task> notBookmarkedTasks = taskRepository.saveAll(findNotBookmarkedTask(taskDtos));
-        List<Task> tasks = new ArrayList<>();
-        tasks.addAll(bookmarkedTasks);
-        tasks.addAll(notBookmarkedTasks);
-
-        List<Plantask> plantasks = plantaskRepository.saveAll(tasks.stream()
-                .map(task -> Plantask.builder()
-                        .plan(savedPlan)
-                        .task(task)
+        List<Task> tasks = newTasks.stream()
+                .map(task -> Task.builder()
+                        .name(task.getName())
+                        .time(task.getTime())
+                        .user(user)
                         .build()
-                ).collect(Collectors.toList()));
+                )
+                .collect(Collectors.toList());
+
+        taskRepository.saveAll(tasks);
+
+        List<Plantask> plantasks = new ArrayList<>();
+        for(int i = 0; i < tasks.size(); i++) {
+            plantasks.add(Plantask.builder()
+                    .plan(savedPlan)
+                    .task(tasks.get(i))
+                    .sequence(i + 1)
+                    .build()
+            );
+        }
+        plantaskRepository.saveAll(plantasks);
         savedPlan.registerPlantasks(plantasks);
+
         return savedPlan;
     }
 
@@ -66,77 +70,68 @@ public class PlanService {
     }
 
     @Transactional
-    public Plan modify(Plan oldPlan, Plan newPlan, List<TaskDto> taskDtos) {
+    public Plan modify(Plan oldPlan, Plan newPlan, List<Task> newTasks) {
+        User user = oldPlan.getUser();
+        List<Long> oldTaskIds = getTaskIdList(oldPlan);
+
+        // 기존 plantask 삭제
+        plantaskService.deleteByPlanId(oldPlan.getId());
+
+        // 수정된 plan 저장
         oldPlan.modify(newPlan);
         Plan modifiedPlan = planRepository.save(oldPlan);
-
-        // TODO: 로직 수정
-
-        // 기존 plantask  삭제
-        plantaskService.deleteByPlanId(modifiedPlan.getId());
-
-        // 기존 task 삭제
-        deleteNotBookmarkedTask(modifiedPlan);
 
         List<Task> tasks = new ArrayList<>();
 
         // 준비항목이 없는 경우
-        if(taskDtos.size() == 0) {
-            modifiedPlan.registerPlantask(tasks);
+        if(newTasks.size() == 0) {
+            // 기존 task 삭제
+            taskRepository.deleteByIdIn(oldTaskIds);
+
+            modifiedPlan.modifyPlantasks(tasks);
             return modifiedPlan;
         }
 
-        // 북마크가 아닌 준비항목은 task db에 저장
-        tasks = taskService.saveAll(findNotBookmarkedTask(taskDtos));
+        for(int i = 0; i < newTasks.size(); i++) {
+            Task task = newTasks.get(i);
+            // 새로운 task는 db에 저장
+            if(!oldTaskIds.contains(newTasks.get(i).getId())) {
+                task = taskRepository.save(
+                        Task.builder()
+                                .name(task.getName())
+                                .time(task.getTime())
+                                .user(user)
+                                .build()
+                );
+            }
+            tasks.add(task);
+        }
 
-        // plantask 등록
-        tasks.addAll(findBookmarkedTask(taskDtos));
-        modifiedPlan.registerPlantask(tasks);
+        List<Long> newTaskIds = tasks.stream()
+                .map(task -> task.getId())
+                .collect(Collectors.toList());
 
-        // plantask db 저장
-        plantaskService.saveAll(modifiedPlan.getPlantasks());
+        // 삭제할 task 목록
+        List<Long> removeTaskIds = oldTaskIds.stream()
+                .filter(oldTaskId -> !newTaskIds.contains(oldTaskId))
+                .collect(Collectors.toList());
+        taskRepository.deleteByIdIn(removeTaskIds);
+
+        plantaskRepository.saveAll(modifiedPlan.modifyPlantasks(tasks));
 
         return modifiedPlan;
     }
 
     @Transactional
     public void delete(Plan plan) {
-        // task 삭제
-        deleteNotBookmarkedTask(plan);
-
+        taskRepository.deleteByIdIn(getTaskIdList(plan));
         planRepository.delete(plan);
     }
 
-    // 북마크가 아닌 task 삭제
-    @Transactional
-    public void deleteNotBookmarkedTask(Plan plan) {
-        List<Task> tasks = plan.getTaskList().stream()
-                .filter(task -> !task.getIsBookmarked())
-                .collect(Collectors.toList());
-        taskService.deleteAll(tasks);
-    }
-
-    @Transactional
-    public ImportantPlanDto registerImportant(Long planId) {
-        return new ImportantPlanDto(planId, planRepository.getById(planId).modifyImportantStatus());
-    }
-
-    @Transactional(readOnly = true)
-    public List<Plan> getImportantList(Long userId) {
-        return planRepository.findByUserIdAndIsImportantOrderByArrivalAtAsc(userId, true);
-    }
-
-    public List<Task> findNotBookmarkedTask (List<TaskDto> taskDtos) {
-        return taskDtos.stream()
-                .filter(taskDto -> !taskDto.getIsBookmarked())
-                .map(taskMapper::toEntity)
-                .collect(Collectors.toList());
-    }
-
-    public List<Task> findBookmarkedTask (List<TaskDto> taskDtos) {
-        return taskDtos.stream()
-                .filter(taskDto -> taskDto.getIsBookmarked())
-                .map(taskMapper::toEntity)
+    // plan의 준비항목 id 반환하는 함수
+    public List<Long> getTaskIdList(Plan plan) {
+        return plan.getTaskList().stream()
+                .map(task -> task.getId())
                 .collect(Collectors.toList());
     }
 
