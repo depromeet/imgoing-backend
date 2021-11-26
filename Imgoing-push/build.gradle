@@ -1,5 +1,15 @@
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+    implementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo' // in-memory db
+
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    implementation 'com.google.firebase:firebase-admin:6.8.1'
+    implementation 'com.squareup.okhttp3:okhttp'
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'io.projectreactor:reactor-test'
 }
