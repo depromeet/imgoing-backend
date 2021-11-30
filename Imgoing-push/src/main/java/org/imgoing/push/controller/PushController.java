@@ -3,7 +3,7 @@ package org.imgoing.push.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.imgoing.push.dto.FcmMessage;
+import org.imgoing.push.dto.FcmDto;
 import org.imgoing.push.service.FcmService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,10 +21,19 @@ public class PushController {
 
     @ApiOperation(value = "특정 유저에게 푸시 전송")
     @PostMapping
-    public void sendMessageByTarget(@RequestBody FcmMessage request) throws IOException {
-        fcmService.sendMessageTo(request.getMessage().getToken(),
-                request.getMessage().getNotification().getTitle(),
-                request.getMessage().getNotification().getBody()
+    public void sendToTarget(@RequestBody FcmDto request) throws IOException {
+        fcmService.sendToTarget(request.getTokens().get(0),
+                request.getNotification().getTitle(),
+                request.getNotification().getBody()
+        );
+    }
+
+    @ApiOperation(value = "여러 유저에게 푸시 전송")
+    @PostMapping("/people")
+    public void sendToPeople(@RequestBody FcmDto request) throws IOException {
+        fcmService.sendToPeople(request.getTokens(),
+                request.getNotification().getTitle(),
+                request.getNotification().getBody()
         );
     }
 }
