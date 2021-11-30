@@ -25,7 +25,7 @@ public class FcmService {
     private String getAccessToken() throws IOException {
         String firebaseConfigPath = "firebase/dpm-imgoing-firebase-adminsdk-egokj-7aa4ab4857.json";
 
-        GoogleCredentials googleCredentials = GoogleCredentials // GoogleApi를 사용하기 위해서 oauth2를 이용해 인증한 대상을 나타내는 객체
+        GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
@@ -37,7 +37,8 @@ public class FcmService {
         FcmMessage fcmMessage = makeMessage(targetToken, title, body);
         Mono<FcmMessage> messageMono = Mono.just(fcmMessage);
 
-        Mono<JsonNode> response = webClient
+        Mono<JsonNode> response = webClient.mutate()
+                .build()
                 .post()
                 .uri(API_URL)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
