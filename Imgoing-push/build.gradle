@@ -1,7 +1,11 @@
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'io.projectreactor:reactor-core'
+    implementation 'io.projectreactor.tools:blockhound:1.0.6.RELEASE'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+    implementation 'org.mongodb:mongodb-driver-sync' // driver-sync 하지 않으면 mongoOperation에서 파라미터 생성 불가
     implementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo' // in-memory db
 
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
