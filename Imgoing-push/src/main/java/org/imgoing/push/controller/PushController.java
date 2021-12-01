@@ -19,19 +19,10 @@ import java.io.IOException;
 public class PushController {
     private final FcmService fcmService;
 
-    @ApiOperation(value = "특정 유저에게 푸시 전송")
+    @ApiOperation(value = "유저에게 푸시 전송")
     @PostMapping
-    public void sendToTarget(@RequestBody FcmDto request) throws IOException {
-        fcmService.sendToTarget(request.getTokens().get(0),
-                request.getNotification().getTitle(),
-                request.getNotification().getBody()
-        );
-    }
-
-    @ApiOperation(value = "여러 유저에게 푸시 전송")
-    @PostMapping("/people")
-    public void sendToPeople(@RequestBody FcmDto request) throws IOException {
-        fcmService.sendToPeople(request.getTokens(),
+    public void send(@RequestBody FcmDto request) throws IOException {
+        fcmService.send(request.getTokens(),
                 request.getNotification().getTitle(),
                 request.getNotification().getBody()
         );

@@ -7,11 +7,10 @@ import org.imgoing.push.dto.FcmMessage;
 import org.imgoing.push.dto.Notification;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,17 +33,21 @@ public class FcmService {
         return googleCredentials.getAccessToken().getTokenValue();
     }
 
-    public void sendToTarget(String targetToken, String title, String body) throws IOException {
-        FcmMessage fcmMessage = makeMessage(targetToken, title, body);
-        Mono<FcmMessage> messageMono = Mono.just(fcmMessage);
-
+    public void send(List<String> targetTokens, String title, String body) throws IOException {
+        String authorization = "Bearer " + getAccessToken();
         long startTime = System.currentTimeMillis();
 
-        webClient
+        Flux<FcmMessage> fcmMessageFlux = Flux.fromStream(targetTokens.stream()
+                .map(targetToken -> makeMessage(targetToken, title, body))
+        );
+
+        fcmMessageFlux.subscribe(fcmMessage -> webClient
                 .post()
                 .uri(API_URL)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
-                .body(messageMono, FcmMessage.class)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, authorization)
+                .bodyValue(fcmMessage)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError()
                                 || status.is5xxServerError()
@@ -52,32 +55,9 @@ public class FcmService {
                                 clientResponse.bodyToMono(String.class)
                                         .map(b -> new RuntimeException(b))
                 )
-                .bodyToMono(String.class)
-                .subscribe(res -> log.debug("{}", res));
-
-        log.info("end: " + (System.currentTimeMillis() - startTime) + "sec");
-    }
-
-    public void sendToPeople(List<String> targetTokens, String title, String body) throws IOException {
-        String authorization = "Bearer " + getAccessToken();
-        long startTime = System.currentTimeMillis();
-
-        Flux.fromIterable(targetTokens)
-                .flatMap(targetToken -> Mono.just(makeMessage(targetToken, title, body)))
-                .map(messageMono -> webClient
-                        .post()
-                        .uri(API_URL)
-                        .header(HttpHeaders.AUTHORIZATION, authorization)
-                        .body(messageMono, FcmMessage.class)
-                        .retrieve()
-                        .onStatus(status -> status.is4xxClientError()
-                                        || status.is5xxServerError()
-                                , clientResponse ->
-                                        clientResponse.bodyToMono(String.class)
-                                                .map(b -> new RuntimeException(b))
-                        )
-                        .bodyToMono(String.class))
-                .subscribeOn(Schedulers.parallel());
+                .bodyToFlux(String.class)
+                .subscribe(res -> log.info("{}", res))
+        );
 
         log.info("end: " + (System.currentTimeMillis() - startTime) + "sec");
     }
