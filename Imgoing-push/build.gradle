@@ -8,11 +8,13 @@ dependencies {
     implementation 'org.mongodb:mongodb-driver-sync' // driver-sync 하지 않으면 mongoOperation에서 파라미터 생성 불가
     implementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo' // in-memory db
 
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-    implementation 'com.google.firebase:firebase-admin:6.8.1'
-    implementation 'com.squareup.okhttp3:okhttp'
+    implementation 'com.google.firebase:firebase-admin:6.12.2'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'io.projectreactor:reactor-test'
