@@ -3,12 +3,16 @@ package org.imgoing.api.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.dto.PlantaskDto;
 import org.imgoing.api.domain.entity.Plantask;
 import org.imgoing.api.domain.entity.Task;
+import org.imgoing.api.dto.plan.PlanDto;
+import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.mapper.PlantaskMapper;
+import org.imgoing.api.service.PlanService;
 import org.imgoing.api.service.PlantaskService;
 import org.imgoing.api.support.ImgoingResponse;
 import org.springframework.http.HttpStatus;
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/plantasks")
 public class PlantaskController {
     private final PlantaskService plantaskService;
+    private final PlanService planService;
     private final PlantaskMapper plantaskMapper;
 
     @ApiOperation(value = "구성된 준비항목 생성")
@@ -85,5 +90,18 @@ public class PlantaskController {
         plantaskService.delete(plantask);
         String responseMessage = "id = " + id + "구성된 준비항목이 삭제되었습니다.";
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
+    }
+
+    @ApiOperation(value = "일정 조회", notes = "최근 7일 일정 내의 task 조회")
+    @GetMapping("")
+    @ApiResponse(code = 200, message = "일정 조회 성공")
+    public ImgoingResponse<List<PlantaskDto.Read>> getHistoryDaysAgo(
+            User user,
+            @RequestParam("days") Integer days
+    ) {
+        List<PlantaskDto.Read> planTaskHistory = this.planService.getPlanHistoryDaysAgo(user, days).stream()
+                .flatMap(plan -> plan.getPlantasks().stream().map(plantaskMapper::toDto))
+                .collect(Collectors.toList());
+        return new ImgoingResponse<>(planTaskHistory, HttpStatus.OK);
     }
 }

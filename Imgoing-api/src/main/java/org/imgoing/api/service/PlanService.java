@@ -157,4 +157,9 @@ public class PlanService {
         Duration remainingTime = Duration.between(now, preparationStartAt);
         return new RemainingTimeInfoVo(remainingTime, routeAverageMins, preparationMins, recentPlanArrivalAt);
     }
+
+    public List<Plan> getPlanHistoryDaysAgo (User user, Integer days) {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(days);
+        return this.planRepository.findByUserAndArrivalAtLessThan(user, sevenDaysAgo);
+    }
 }

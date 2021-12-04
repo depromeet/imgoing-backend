@@ -63,6 +63,19 @@ public class PlanController {
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
     }
 
+    @ApiOperation(value = "일정 조회", notes = "최근 7일 일정 조회")
+    @GetMapping("")
+    @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
+    public ImgoingResponse<List<PlanDto>> getHistoryDaysAgo(
+            User user,
+            @RequestParam("days") Integer days
+    ) {
+        List<PlanDto> planHistory = this.planService.getPlanHistoryDaysAgo(user, days).stream()
+                .map(plan -> planMapper.toDto(plan, plan.getTaskList()))
+                .collect(Collectors.toList());
+        return new ImgoingResponse<>(planHistory, HttpStatus.OK);
+    }
+
     @ApiOperation(value = "일정 수정")
     @PutMapping("/{planId}")
     @ApiResponses({
