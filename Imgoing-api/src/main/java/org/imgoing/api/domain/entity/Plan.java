@@ -64,6 +64,12 @@ public class Plan extends BaseTime {
     @OneToMany(mappedBy = "plan", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Plantask> plantasks = new ArrayList<>();
 
+    @Column
+    private Boolean isUserLate;
+
+    @Column
+    private LocalDateTime actualArrivalAt;
+
     public void registerPlantask(List<Task> tasks) {
         this.plantasks.clear();
         List<Plantask> plantasks = tasks.stream()
@@ -100,6 +106,11 @@ public class Plan extends BaseTime {
     public Boolean modifyImportantStatus() {
         this.isImportant = !this.isImportant;
         return this.isImportant;
+    }
+
+    public void recordArrivalOfAppointment(Boolean isUserLate, LocalDateTime actualArrivalAt) {
+        this.isUserLate = isUserLate;
+        this.actualArrivalAt = actualArrivalAt;
     }
 
     @PrePersist

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.*;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
 import org.imgoing.api.dto.plan.ImportantPlanDto;
+import org.imgoing.api.dto.plan.PlanArrivalRequest;
 import org.imgoing.api.dto.route.RouteSearchRequest;
 import org.imgoing.api.dto.task.TaskDto;
 import org.imgoing.api.mapper.TaskMapper;
@@ -158,8 +159,16 @@ public class PlanService {
         return new RemainingTimeInfoVo(remainingTime, routeAverageMins, preparationMins, recentPlanArrivalAt);
     }
 
+    @Transactional(readOnly = true)
     public List<Plan> getPlanHistoryDaysAgo (User user, Integer days) {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(days);
         return this.planRepository.findByUserAndArrivalAtLessThan(user, sevenDaysAgo);
+    }
+
+    @Transactional
+    public void recordArrivalInformation (Plan plan, PlanArrivalRequest planArrivalRequest) {
+        Boolean isUserLate = planArrivalRequest.getIsUserLate();
+        LocalDateTime actualArrivalAt = planArrivalRequest.getActualArrivalAt();
+        plan.recordArrivalOfAppointment(isUserLate, actualArrivalAt);
     }
 }
