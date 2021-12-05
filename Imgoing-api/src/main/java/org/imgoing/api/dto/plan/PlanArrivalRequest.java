@@ -10,6 +10,5 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlanArrivalRequest {
-    private Boolean isUserLate;
     private LocalDateTime actualArrivalAt;
 }
