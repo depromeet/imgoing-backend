@@ -108,8 +108,8 @@ public class Plan extends BaseTime {
         return this.isImportant;
     }
 
-    public void recordArrivalOfAppointment(Boolean isUserLate, LocalDateTime actualArrivalAt) {
-        this.isUserLate = isUserLate;
+    public void recordArrivalOfAppointment(LocalDateTime actualArrivalAt) {
+        this.isUserLate = actualArrivalAt.isAfter(this.getArrivalAt());
         this.actualArrivalAt = actualArrivalAt;
     }
 

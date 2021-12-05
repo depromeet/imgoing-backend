@@ -169,7 +169,6 @@ public class PlanService {
     public void recordArrivalInformation (Long planId, PlanArrivalRequest planArrivalRequest) {
         Plan plan = this.planRepository.findById(planId).orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "Plan이 없습니다."));
         LocalDateTime actualArrivalAt = planArrivalRequest.getActualArrivalAt();
-        Boolean isUserLate = actualArrivalAt.isAfter(plan.getArrivalAt());
-        plan.recordArrivalOfAppointment(isUserLate, actualArrivalAt);
+        plan.recordArrivalOfAppointment(actualArrivalAt);
     }
 }
