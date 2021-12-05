@@ -162,7 +162,7 @@ public class PlanService {
     @Transactional(readOnly = true)
     public List<Plan> getPlanHistoryDaysAgo (User user, Integer days) {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(days);
-        return this.planRepository.findByUserAndArrivalAtGreaterThan(user, sevenDaysAgo);
+        return this.planRepository.findByUserAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(user, sevenDaysAgo);
     }
 
     @Transactional
