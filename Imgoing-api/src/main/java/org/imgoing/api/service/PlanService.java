@@ -162,12 +162,13 @@ public class PlanService {
     @Transactional(readOnly = true)
     public List<Plan> getPlanHistoryDaysAgo (User user, Integer days) {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(days);
-        return this.planRepository.findByUserAndArrivalAtLessThan(user, sevenDaysAgo);
+        return this.planRepository.findByUserAndArrivalAtGreaterThan(user, sevenDaysAgo);
     }
 
     @Transactional
-    public void recordArrivalInformation (Plan plan, PlanArrivalRequest planArrivalRequest) {
-        Boolean isUserLate = planArrivalRequest.getIsUserLate();
+    public void recordArrivalInformation (Long planId, PlanArrivalRequest planArrivalRequest) {
+        Plan plan = this.planRepository.findById(planId).orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "Plan이 없습니다."));
+        Boolean isUserLate = planArrivalRequest.getActualArrivalAt().isAfter(plan.getArrivalAt());
         LocalDateTime actualArrivalAt = planArrivalRequest.getActualArrivalAt();
         plan.recordArrivalOfAppointment(isUserLate, actualArrivalAt);
     }

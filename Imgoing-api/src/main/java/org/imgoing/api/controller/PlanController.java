@@ -66,8 +66,8 @@ public class PlanController {
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
     }
 
-    @ApiOperation(value = "일정 조회", notes = "최근 7일 일정 조회")
-    @GetMapping("")
+    @ApiOperation(value = "일정 히스토리 조회", notes = "최근 N일 일정 조회")
+    @GetMapping("/history")
     @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
     public ImgoingResponse<List<PlanDto>> getHistoryDaysAgo(
             User user,
@@ -140,16 +140,14 @@ public class PlanController {
         return new ImgoingResponse<>(new RemainingTimeResponse(remainingTimeInfoVo));
     }
 
-    @ApiOperation(value = "일정 마무리 정보 기록")
+    @ApiOperation(value = "일정 도착 정보 기록")
     @PostMapping("/arrival/{planId}")
-    public ImgoingResponse<Map<String, Boolean>> getMonthlyStat (
-            HttpServletRequest httpServletRequest,
+    public ImgoingResponse<Map<String, Boolean>> recordArrivalInformation (
             @ApiParam(value = "일정 id", required = true, example = "1")
             @PathVariable(value = "planId") Long planId,
             @RequestBody @Valid PlanArrivalRequest planArrivalRequest
     ) {
-        Plan plan = (Plan)httpServletRequest.getAttribute("plan");
-        planService.recordArrivalInformation(plan, planArrivalRequest);
+        planService.recordArrivalInformation(planId, planArrivalRequest);
         return new ImgoingResponse<>(Map.of("isSuccess", true));
     }
 }

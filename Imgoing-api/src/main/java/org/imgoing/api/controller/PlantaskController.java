@@ -92,9 +92,9 @@ public class PlantaskController {
         return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
     }
 
-    @ApiOperation(value = "일정 조회", notes = "최근 7일 일정 내의 task 조회")
-    @GetMapping("")
-    @ApiResponse(code = 200, message = "일정 조회 성공")
+    @ApiOperation(value = "구성된 준비항목 히스토리 조회", notes = "최근 N일 일정 내의 task 조회")
+    @GetMapping("/history")
+    @ApiResponse(code = 200, message = "구성된 준비항목 조회 성공")
     public ImgoingResponse<List<PlantaskDto.Read>> getHistoryDaysAgo(
             User user,
             @RequestParam("days") Integer days
