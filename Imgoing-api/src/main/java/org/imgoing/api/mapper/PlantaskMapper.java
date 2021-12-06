@@ -2,7 +2,8 @@ package org.imgoing.api.mapper;
 
 import org.imgoing.api.domain.entity.Plantask;
 import org.imgoing.api.domain.entity.Task;
-import org.imgoing.api.dto.PlantaskDto;
+import org.imgoing.api.dto.plantask.PlantaskRead;
+import org.imgoing.api.dto.plantask.PlantaskCreateRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -14,11 +15,11 @@ import java.util.List;
         uses = { RoutineMapper.class, TaskMapper.class })
 
 public interface PlantaskMapper {
-    PlantaskDto.Read toDto(Plantask plantask);
+    PlantaskRead toDto(Plantask plantask);
 
     @Mapping(target = "id", ignore = true)
     Plantask toEntityForPost(Long routineId, List<Task> taskList); // routineId는 더미 데이터
 
     @Mapping(target = "id", source = "routineId")
-    Plantask toEntityForPut(PlantaskDto.Read routineDto, Long routineId);
+    Plantask toEntityForPut(PlantaskRead routineDto, Long routineId);
 }
