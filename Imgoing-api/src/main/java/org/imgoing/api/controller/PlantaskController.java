@@ -41,7 +41,7 @@ public class PlantaskController {
                 .map(taskId -> Task.builder().id(taskId).build())
                 .collect(Collectors.toList());
 
-        Plantask newPlantask = plantaskMapper.toEntityForPost(0L, taskList);
+        Plantask newPlantask = plantaskMapper.toEntityForPost(taskList);
 
         return new ImgoingResponse<>(new PlantaskRead(plantaskService.create(newPlantask), taskMapper), HttpStatus.CREATED);
     }
@@ -76,7 +76,7 @@ public class PlantaskController {
             @ApiParam(value = "구성된 준비항목 id", required = true, example = "1")
             @PathVariable(value = "plantaskId") Long id
     ) {
-        Plantask newPlantask = plantaskMapper.toEntityForPut(plantaskDto, id);
+        Plantask newPlantask = plantaskMapper.toEntityForPut(plantaskDto);
 
         return new ImgoingResponse<>(new PlantaskRead(plantaskService.update(newPlantask), taskMapper), HttpStatus.CREATED);
     }

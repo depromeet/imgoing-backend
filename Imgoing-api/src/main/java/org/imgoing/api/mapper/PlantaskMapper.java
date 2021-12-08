@@ -12,11 +12,10 @@ import java.util.List;
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         uses = { RoutineMapper.class, TaskMapper.class })
-
 public interface PlantaskMapper {
     @Mapping(target = "id", ignore = true)
-    Plantask toEntityForPost(Long routineId, List<Task> taskList); // routineId는 더미 데이터
+    Plantask toEntityForPost(List<Task> taskList);
 
-    @Mapping(target = "id", source = "routineId")
-    Plantask toEntityForPut(PlantaskRead routineDto, Long routineId);
+    @Mapping(target = "id", ignore = true)
+    Plantask toEntityForPut(PlantaskRead taskDto);
 }

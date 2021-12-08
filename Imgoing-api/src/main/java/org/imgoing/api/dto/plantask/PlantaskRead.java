@@ -30,7 +30,9 @@ public class PlantaskRead {
 
     public PlantaskRead(Plantask plantask, TaskMapper taskMapper) {
         this.id = plantask.getId();
-        this.planId = plantask.getPlan().getId();
+        if (plantask.getPlan() != null) {
+            this.planId = plantask.getPlan().getId();
+        }
         this.task = taskMapper.toDto(plantask.getTask());
     }
 }
