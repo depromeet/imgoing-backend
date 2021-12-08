@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.*;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
 import org.imgoing.api.dto.plan.ImportantPlanDto;
+import org.imgoing.api.dto.plan.PlanArrivalRequest;
 import org.imgoing.api.dto.route.RouteSearchRequest;
 import org.imgoing.api.dto.task.TaskDto;
 import org.imgoing.api.mapper.TaskMapper;
@@ -156,5 +157,18 @@ public class PlanService {
         LocalDateTime preparationStartAt = recentPlanArrivalAt.minusMinutes(routeAverageMins + preparationMins);
         Duration remainingTime = Duration.between(now, preparationStartAt);
         return new RemainingTimeInfoVo(remainingTime, routeAverageMins, preparationMins, recentPlanArrivalAt);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Plan> getPlanHistoryDaysAgo (User user, Integer days) {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(days);
+        return this.planRepository.findByUserAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(user, sevenDaysAgo);
+    }
+
+    @Transactional
+    public void recordArrivalInformation (Long planId, PlanArrivalRequest planArrivalRequest) {
+        Plan plan = this.planRepository.findById(planId).orElseThrow(() -> new ImgoingException(ImgoingError.BAD_REQUEST, "Plan이 없습니다."));
+        LocalDateTime actualArrivalAt = planArrivalRequest.getActualArrivalAt();
+        plan.recordArrivalOfAppointment(actualArrivalAt);
     }
 }

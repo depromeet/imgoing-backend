@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.User;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
 import org.imgoing.api.dto.plan.ImportantPlanDto;
+import org.imgoing.api.dto.plan.PlanArrivalRequest;
 import org.imgoing.api.dto.plan.PlanDto;
 import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.dto.route.RemainingTimeResponse;
+import org.imgoing.api.dto.user.UserMonthlyStatResponse;
 import org.imgoing.api.mapper.PlanMapper;
 import org.imgoing.api.service.PlanService;
 import org.imgoing.api.support.ImgoingResponse;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -61,6 +64,19 @@ public class PlanController {
     ) {
         Plan plan = (Plan)httpServletRequest.getAttribute("plan");
         return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
+    }
+
+    @ApiOperation(value = "일정 히스토리 조회", notes = "최근 N일 일정 조회")
+    @GetMapping("/history")
+    @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
+    public ImgoingResponse<List<PlanDto>> getHistoryDaysAgo(
+            User user,
+            @RequestParam("days") Integer days
+    ) {
+        List<PlanDto> planHistory = this.planService.getPlanHistoryDaysAgo(user, days).stream()
+                .map(plan -> planMapper.toDto(plan, plan.getTaskList()))
+                .collect(Collectors.toList());
+        return new ImgoingResponse<>(planHistory, HttpStatus.OK);
     }
 
     @ApiOperation(value = "일정 수정")
@@ -122,5 +138,16 @@ public class PlanController {
     public ImgoingResponse<RemainingTimeResponse> getRemainingTime (User user) {
         RemainingTimeInfoVo remainingTimeInfoVo = planService.getTimeRemainingUntilRecentPlan(user);
         return new ImgoingResponse<>(new RemainingTimeResponse(remainingTimeInfoVo));
+    }
+
+    @ApiOperation(value = "일정 도착 정보 기록")
+    @PostMapping("/arrival/{planId}")
+    public ImgoingResponse<Map<String, Boolean>> recordArrivalInformation (
+            @ApiParam(value = "일정 id", required = true, example = "1")
+            @PathVariable(value = "planId") Long planId,
+            @RequestBody @Valid PlanArrivalRequest planArrivalRequest
+    ) {
+        planService.recordArrivalInformation(planId, planArrivalRequest);
+        return new ImgoingResponse<>(Map.of("isSuccess", true));
     }
 }
