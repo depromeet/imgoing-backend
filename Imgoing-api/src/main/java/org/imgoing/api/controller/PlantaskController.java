@@ -13,6 +13,7 @@ import org.imgoing.api.domain.entity.Task;
 import org.imgoing.api.dto.plan.PlanDto;
 import org.imgoing.api.dto.plan.PlanRequest;
 import org.imgoing.api.mapper.PlantaskMapper;
+import org.imgoing.api.mapper.TaskMapper;
 import org.imgoing.api.service.PlanService;
 import org.imgoing.api.service.PlantaskService;
 import org.imgoing.api.support.ImgoingResponse;
@@ -30,18 +31,19 @@ public class PlantaskController {
     private final PlantaskService plantaskService;
     private final PlanService planService;
     private final PlantaskMapper plantaskMapper;
+    private final TaskMapper taskMapper;
 
     @ApiOperation(value = "구성된 준비항목 생성")
     @PostMapping
-    public ImgoingResponse<PlantaskRead> create(User user, @RequestBody PlantaskCreateRequest dto) {
-        List<Task> taskList = dto.getTaskIdList()
+    public ImgoingResponse<PlantaskRead> create(User user, @RequestBody PlantaskCreateRequest request) {
+        List<Task> taskList = request.getTaskIdList()
                 .stream()
                 .map(taskId -> Task.builder().id(taskId).build())
                 .collect(Collectors.toList());
 
         Plantask newPlantask = plantaskMapper.toEntityForPost(0L, taskList);
 
-        return new ImgoingResponse<>(plantaskMapper.toDto(plantaskService.create(newPlantask)), HttpStatus.CREATED);
+        return new ImgoingResponse<>(new PlantaskRead(plantaskService.create(newPlantask), taskMapper), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "구성된 준비항목 조회")
@@ -53,14 +55,14 @@ public class PlantaskController {
     ) {
         Plantask plantask = plantaskService.getById(id);
 
-        return new ImgoingResponse<>(plantaskMapper.toDto(plantask));
+        return new ImgoingResponse<>(new PlantaskRead(plantask, taskMapper));
     }
 
     @ApiOperation(value = "구성된 준비항목 리스트 전체 조회")
     @GetMapping("/all")
     public ImgoingResponse<List<PlantaskRead>> getListAll() {
         List<PlantaskRead> plantaskDtoList = plantaskService.getListAll().stream()
-                .map(plantaskMapper::toDto)
+                .map(plantask -> new PlantaskRead(plantask, taskMapper))
                 .collect(Collectors.toList());
 
         return new ImgoingResponse<>(plantaskDtoList);
@@ -76,7 +78,7 @@ public class PlantaskController {
     ) {
         Plantask newPlantask = plantaskMapper.toEntityForPut(plantaskDto, id);
 
-        return new ImgoingResponse<>(plantaskMapper.toDto(plantaskService.update(newPlantask)), HttpStatus.CREATED);
+        return new ImgoingResponse<>(new PlantaskRead(plantaskService.update(newPlantask), taskMapper), HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "구성된 준비항목 삭제")
@@ -101,7 +103,7 @@ public class PlantaskController {
             @RequestParam("days") Integer days
     ) {
         List<PlantaskRead> planTaskHistory = this.planService.getPlanHistoryDaysAgo(user, days).stream()
-                .flatMap(plan -> plan.getPlantasks().stream().map(plantaskMapper::toDto))
+                .flatMap(plan -> plan.getPlantasks().stream().map(plantask -> new PlantaskRead(plantask, taskMapper)))
                 .collect(Collectors.toList());
         return new ImgoingResponse<>(planTaskHistory, HttpStatus.OK);
     }
