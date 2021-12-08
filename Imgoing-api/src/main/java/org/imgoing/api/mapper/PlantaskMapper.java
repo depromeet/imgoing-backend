@@ -14,7 +14,8 @@ import java.util.List;
         uses = { RoutineMapper.class, TaskMapper.class })
 public interface PlantaskMapper {
     @Mapping(target = "id", ignore = true)
-    Plantask toEntityForPost(List<Task> taskList);
+    @Mapping(target = "task", source = "task")
+    Plantask toEntityForPost(Task task);
 
     @Mapping(target = "id", ignore = true)
     Plantask toEntityForPut(PlantaskRead taskDto);

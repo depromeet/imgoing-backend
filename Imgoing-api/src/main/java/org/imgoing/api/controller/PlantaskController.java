@@ -35,15 +35,13 @@ public class PlantaskController {
 
     @ApiOperation(value = "구성된 준비항목 생성")
     @PostMapping
-    public ImgoingResponse<PlantaskRead> create(User user, @RequestBody PlantaskCreateRequest request) {
-        List<Task> taskList = request.getTaskIdList()
+    public ImgoingResponse<List<PlantaskRead>> create(User user, @RequestBody PlantaskCreateRequest request) {
+        List<PlantaskRead> plantaskReadList = request.getTaskIdList()
                 .stream()
-                .map(taskId -> Task.builder().id(taskId).build())
+                .map(taskId -> plantaskMapper.toEntityForPost(Task.builder().id(taskId).build()))
+                .map(plantask -> new PlantaskRead(plantaskService.create(plantask), taskMapper))
                 .collect(Collectors.toList());
-
-        Plantask newPlantask = plantaskMapper.toEntityForPost(taskList);
-
-        return new ImgoingResponse<>(new PlantaskRead(plantaskService.create(newPlantask), taskMapper), HttpStatus.CREATED);
+        return new ImgoingResponse<>(plantaskReadList, HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "구성된 준비항목 조회")
