@@ -54,9 +54,6 @@ public class Plan extends BaseTime {
     @Column
     private String belongings;
 
-    @Column
-    private Boolean isImportant;
-
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
@@ -69,26 +66,6 @@ public class Plan extends BaseTime {
 
     @Column
     private LocalDateTime actualArrivalAt;
-
-    public void registerPlantask(List<Task> tasks) {
-        this.plantasks.clear();
-        List<Plantask> plantasks = tasks.stream()
-                .map(task -> Plantask.builder()
-                        .plan(this)
-                        .task(task)
-                        .build()
-                ).collect(Collectors.toList());
-        this.plantasks.addAll(plantasks);
-    }
-
-    // plantask 새로 추가
-    public void registerPlantasks(List<Plantask> plantasks) {
-        this.plantasks = plantasks;
-    }
-
-    public List<Task> getTaskList() {
-        return plantasks.stream().map(Plantask::getTask).collect(Collectors.toList());
-    }
 
     public void modify(Plan newPlan) {
         this.name = newPlan.getName();
@@ -103,18 +80,8 @@ public class Plan extends BaseTime {
         this.belongings = newPlan.getBelongings();
     }
 
-    public Boolean modifyImportantStatus() {
-        this.isImportant = !this.isImportant;
-        return this.isImportant;
-    }
-
     public void recordArrivalOfAppointment(LocalDateTime actualArrivalAt) {
         this.isUserLate = actualArrivalAt.isAfter(this.getArrivalAt());
         this.actualArrivalAt = actualArrivalAt;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        this.isImportant = this.isImportant == null ? false : this.isImportant;
     }
 }
