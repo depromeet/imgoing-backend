@@ -1,7 +1,6 @@
 package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.imgoing.api.domain.entity.*;
 import org.imgoing.api.domain.vo.RemainingTimeInfoVo;
 import org.imgoing.api.dto.plan.PlanArrivalRequest;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PlanService {
@@ -58,7 +56,6 @@ public class PlanService {
     public List<PlanDto> getAll(User user) {
         LocalDateTime now = LocalDateTime.now();
         List<Plan> planList = planRepository.findByUserIdAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(user.getId(), now);
-        log.info("planList size = {}", planList.size());
         return planList.stream()
                 .map(plan -> planMapper.toDto(plan, plantaskService.getTaskListByPlan(plan)))
                 .collect(Collectors.toList());
