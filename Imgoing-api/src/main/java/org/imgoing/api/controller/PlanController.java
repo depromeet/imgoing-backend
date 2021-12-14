@@ -47,30 +47,30 @@ public class PlanController {
         return new ImgoingResponse<>(planService.getAll(user), HttpStatus.OK);
     }
 
-//    @ApiOperation(value = "일정 조회", notes = "사용자의 특정 일정 조회")
-//    @GetMapping("/{planId}")
-//    @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
-//    public ImgoingResponse<PlanDto> getOne(
-//            HttpServletRequest httpServletRequest,
-//            @ApiParam(value = "일정 id", required = true, example = "1")
-//            @PathVariable(value = "planId") Long planId
-//    ) {
-//        Plan plan = (Plan)httpServletRequest.getAttribute("plan");
-//        return new ImgoingResponse<>(planMapper.toDto(plan, plan.getTaskList()));
-//    }
-//
-//    @ApiOperation(value = "일정 히스토리 조회", notes = "최근 N일 일정 조회")
-//    @GetMapping("/history")
-//    @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
-//    public ImgoingResponse<List<PlanDto>> getHistoryDaysAgo(
-//            User user,
-//            @RequestParam("days") Integer days
-//    ) {
-//        List<PlanDto> planHistory = this.planService.getPlanHistoryDaysAgo(user, days).stream()
-//                .map(plan -> planMapper.toDto(plan, plan.getTaskList()))
-//                .collect(Collectors.toList());
-//        return new ImgoingResponse<>(planHistory, HttpStatus.OK);
-//    }
+   @ApiOperation(value = "일정 조회", notes = "사용자의 특정 일정 조회")
+   @GetMapping("/{planId}")
+   @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
+   public ImgoingResponse<PlanDto> getOne(
+           HttpServletRequest httpServletRequest,
+           @ApiParam(value = "일정 id", required = true, example = "1")
+           @PathVariable(value = "planId") Long planId
+   ) {
+       Plan plan = (Plan)httpServletRequest.getAttribute("plan");
+       return new ImgoingResponse<>(planService.getOne(plan));
+   }
+/*
+   @ApiOperation(value = "일정 히스토리 조회", notes = "최근 N일 일정 조회")
+   @GetMapping("/history")
+   @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
+   public ImgoingResponse<List<PlanDto>> getHistoryDaysAgo(
+           User user,
+           @RequestParam("days") Integer days
+   ) {
+       List<PlanDto> planHistory = this.planService.getPlanHistoryDaysAgo(user, days).stream()
+               .map(plan -> planMapper.toDto(plan, plan.getTaskList()))
+               .collect(Collectors.toList());
+       return new ImgoingResponse<>(planHistory, HttpStatus.OK);
+   }*/
 
 //    @ApiOperation(value = "일정 수정")
 //    @PutMapping("/{planId}")

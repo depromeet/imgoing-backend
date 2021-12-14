@@ -46,7 +46,6 @@ public class PlanService {
         }
 
         List<Task> newTaskList = taskService.createAll(user, taskDtoList);
-
         plantaskService.saveAll(savedPlan, newTaskList);
 
         return planMapper.toDto(savedPlan, newTaskList);
@@ -59,6 +58,11 @@ public class PlanService {
         return planList.stream()
                 .map(plan -> planMapper.toDto(plan, plantaskService.getTaskListByPlan(plan)))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public PlanDto getOne(Plan plan) {
+        return planMapper.toDto(plan, plantaskService.getTaskListByPlan(plan));
     }
 
 //    @Transactional
