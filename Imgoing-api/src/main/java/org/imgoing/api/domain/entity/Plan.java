@@ -57,18 +57,21 @@ public class Plan extends BaseTime {
     @Column
     private Boolean isImportant;
 
+    @Column
+    private Boolean isUserLate;
+
+    @Column
+    private LocalDateTime actualArrivalAt;
+
+    @Column
+    private LocalDateTime readyStartAt;
+
     @ManyToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
 
     @OneToMany(mappedBy = "plan", orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Plantask> plantasks = new ArrayList<>();
-
-    @Column
-    private Boolean isUserLate;
-
-    @Column
-    private LocalDateTime actualArrivalAt;
 
     public void registerPlantask(List<Task> tasks) {
         this.plantasks.clear();

@@ -1,4 +1,16 @@
 dependencies {
+    implementation project(":Imgoing-api")
+
+    implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
+    compileOnly('org.projectlombok:lombok')
+
+    // batch
     implementation("org.springframework.boot:spring-boot-starter-batch")
+
+    // message queue
+    implementation("com.rabbitmq:amqp-client:5.9.0")
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+
     testImplementation("org.springframework.batch:spring-batch-test")
 }

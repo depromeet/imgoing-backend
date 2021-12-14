@@ -21,4 +21,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     List<Plan> findByUserAndArrivalAtGreaterThanEqualOrderByArrivalAtAsc(User user, LocalDateTime date);
 
     List<Plan> findAllByUserAndActualArrivalAtGreaterThanEqual(User user, LocalDateTime date);
+
+    List<Plan> findAllByReadyStartAt(LocalDateTime now);
 }
