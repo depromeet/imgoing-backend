@@ -30,6 +30,8 @@ public class PushNotificationJobConfig {
     private final RabbitTemplate rabbitTemplate;
     private final PlanRepository planRepository;
 
+    private static final String EXCHANGE_NAME = "sample.exchange";
+
     @Bean
     public Job job() {
         return jobBuilderFactory.get("job")
@@ -56,6 +58,7 @@ public class PushNotificationJobConfig {
                     List<Plan> planList = planRepository.findAllByReadyStartAt(now);
                     log.info("2. planList size = {}", planList.size());
 
+                    /*
                     // 2-1 시작될 일정이 없으면 return
                     if(planList.size() == 0) {
                         return RepeatStatus.FINISHED;
@@ -70,23 +73,26 @@ public class PushNotificationJobConfig {
                                     .build())
                             .collect(Collectors.toList());
                     log.info("3. publishMessageList size = {}", publishMessageList.size());
+                    */
 
-                    publishMessageList = new ArrayList<>();
+                    List<PublishMessage> publishMessageList = new ArrayList<>();
                     PublishMessage pm = PublishMessage.builder()
                             .userId(Long.parseLong("1"))
                             .planId(Long.parseLong("1"))
                             .message("test message")
                             .build();
                     publishMessageList.add(pm);
+                    log.info("3. test publishMessageList size = {}", publishMessageList.size());
+
                     // 4. message publish 하기
                     try {
-                        rabbitTemplate.convertAndSend("foo", "foo", publishMessageList);
+                        rabbitTemplate.convertAndSend(EXCHANGE_NAME, "sample.#", "sample message");
+                        log.info("4. publish 성공");
                     } catch (AmqpException e) {
                         log.info("publish error -> {}", e);
                         stepContribution.setExitStatus(ExitStatus.FAILED);
                     }
 
-                    log.info("========publish 성공========");
                     // 5. FINISHED 반환
                     return RepeatStatus.FINISHED;
                 }).build();

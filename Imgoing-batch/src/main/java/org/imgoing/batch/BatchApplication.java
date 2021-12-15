@@ -7,9 +7,9 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication
 @EnableScheduling
 @EnableBatchProcessing
+@SpringBootApplication
 @EntityScan(basePackages = {"org.imgoing.api"})
 @EnableJpaRepositories(basePackages = {"org.imgoing.api"})
 public class BatchApplication {
