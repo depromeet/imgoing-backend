@@ -20,28 +20,38 @@ public class PlantaskService {
     private final PlantaskRepository plantaskRepository;
 
     @Transactional
-    public void saveAll(Plan plan, List<Task> taskList) {
-        List<Plantask> plantaskList = new ArrayList<>();
-        for(int i = 0; i < taskList.size(); i++) {
-            plantaskList.add(
-                    Plantask.builder()
-                    .plan(plan)
-                    .task(taskList.get(i))
-                    .sequence(i)
-                    .build()
-            );
-        }
+    public void saveAll(List<Plantask> plantaskList) {
         plantaskRepository.saveAll(plantaskList);
     }
 
     @Transactional
-    public Long deleteByPlanId(Long planId) {
-        return plantaskRepository.deleteByPlanId(planId);
+    public void deleteByPlan(Plan plan) {
+        plantaskRepository.deleteAllByPlan(plan);
+    }
+
+    @Transactional
+    public void deleteAllByPlanId(Long planId) {
+        plantaskRepository.deleteAllByPlanId(planId);
     }
 
     @Transactional
     public Plantask create(Plantask newPlantask){
         return plantaskRepository.save(newPlantask);
+    }
+
+    @Transactional
+    public List<Plantask> createAll(Plan plan, List<Task> taskList) {
+        List<Plantask> plantaskList = new ArrayList<>();
+        for(int i = 0; i < taskList.size(); i++) {
+            plantaskList.add(
+                    Plantask.builder()
+                            .plan(plan)
+                            .task(taskList.get(i))
+                            .sequence(i)
+                            .build()
+            );
+        }
+        return plantaskList;
     }
 
     @Transactional(readOnly = true)
@@ -51,10 +61,20 @@ public class PlantaskService {
     }
 
     @Transactional(readOnly = true)
-    public List<Task> getTaskListByPlan(Plan plan) {
-        return plantaskRepository.getByPlanOrderBySequenceAsc(plan).stream()
+    public List<Task> getTaskListByPlanId(Long planId) {
+        return plantaskRepository.getByPlanIdOrderBySequenceAsc(planId).stream()
                 .map(plantask -> plantask.getTask())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Plantask> getByPlanIdOrderBySequenceAsc(Long planId) {
+        return plantaskRepository.getByPlanIdOrderBySequenceAsc(planId);
+    }
+
+    @Transactional(readOnly = true)
+    public Plantask findOneByPlanIdAndTaskId(Long planId, Long taskId) {
+        return plantaskRepository.findOneByPlanIdAndTaskId(planId, taskId);
     }
 
     @Transactional(readOnly = true)

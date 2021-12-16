@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@DynamicInsert
 @Table(name="plan_tb")
 public class Plan extends BaseTime {
     @Id

@@ -29,8 +29,8 @@ public class Plantask extends BaseTime {
     @Column(nullable = false)
     private Integer sequence;
 
-    public void setPlanTask(Plan plan, Task task) {
-        this.plan = plan;
-        this.task = task;
+    public void modifySequence(Integer sequence) {
+        this.sequence = sequence;
     }
+
 }

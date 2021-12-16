@@ -31,7 +31,7 @@ public class TaskService {
         List<Task> newTaskList = new ArrayList<>();
         for (int i = 0; i < taskDtoList.size(); i++) {
             Task newTask = taskMapper.toEntity(taskDtoList.get(i));
-            if(!newTask.getIsBookmarked()){
+            if(!newTask.getIsBookmarked() && newTask.getId() == null){
                 newTask = Task.builder()
                         .name(newTask.getName())
                         .time(newTask.getTime())
@@ -87,5 +87,10 @@ public class TaskService {
     @Transactional
     public void deleteAll(List<Task> tasks) {
         taskRepository.deleteAll(tasks);
+    }
+
+    @Transactional
+    public void deleteAllByIdIn(List<Long> taskIdList) {
+        taskRepository.deleteAllByIdIn(taskIdList);
     }
 }

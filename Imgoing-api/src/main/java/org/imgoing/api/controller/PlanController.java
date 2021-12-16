@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/plans")
 public class PlanController {
     private final PlanService planService;
-    private final PlanMapper planMapper;
 
     @ApiOperation(value = "일정 생성")
     @PostMapping
@@ -36,7 +35,7 @@ public class PlanController {
             @ApiResponse(code = 201, message = "일정 생성 성공", response = PlanRequest.class),
             @ApiResponse(code = 400, message = "일정 생성 실패")
     })
-    public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanRequest.Create planSaveRequest) {
+    public ImgoingResponse<PlanDto> create(User user, @RequestBody @Valid PlanRequest planSaveRequest) {
         return new ImgoingResponse<>(planService.create(user, planSaveRequest), HttpStatus.CREATED);
     }
 
@@ -58,7 +57,7 @@ public class PlanController {
        Plan plan = (Plan)httpServletRequest.getAttribute("plan");
        return new ImgoingResponse<>(planService.getOne(plan));
    }
-/*
+
    @ApiOperation(value = "일정 히스토리 조회", notes = "최근 N일 일정 조회")
    @GetMapping("/history")
    @ApiResponse(code = 200, message = "일정 조회 성공", response = PlanRequest.class)
@@ -66,42 +65,38 @@ public class PlanController {
            User user,
            @RequestParam("days") Integer days
    ) {
-       List<PlanDto> planHistory = this.planService.getPlanHistoryDaysAgo(user, days).stream()
-               .map(plan -> planMapper.toDto(plan, plan.getTaskList()))
-               .collect(Collectors.toList());
-       return new ImgoingResponse<>(planHistory, HttpStatus.OK);
-   }*/
+       return new ImgoingResponse<>(this.planService.getPlanHistoryDaysAgo(user, days), HttpStatus.OK);
+   }
 
-//    @ApiOperation(value = "일정 수정")
-//    @PutMapping("/{planId}")
-//    @ApiResponses({
-//            @ApiResponse(code = 200, message = "일정 수정 성공", response = PlanRequest.class),
-//            @ApiResponse(code = 400, message = "일정 수정 실패")
-//    })
-//    public ImgoingResponse<PlanDto> modify (
-//            HttpServletRequest httpServletRequest,
-//            @ApiParam(value = "일정 id", required = true, example = "1")
-//            @PathVariable(value = "planId") Long planId,
-//            @RequestBody @Valid PlanRequest planRequest
-//    ) {
-//        Plan oldPlan = (Plan)httpServletRequest.getAttribute("plan");
-//        Plan newPlan = planMapper.toEntity(planRequest);
-//        Plan modifiedplan = planService.modify(oldPlan, newPlan, planRequest.getTask());
-//        return new ImgoingResponse<>(planMapper.toDto(modifiedplan, modifiedplan.getTaskList()));
-//    }
+    @ApiOperation(value = "일정 수정")
+    @PutMapping("/{planId}")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "일정 수정 성공", response = PlanRequest.class),
+            @ApiResponse(code = 400, message = "일정 수정 실패")
+    })
+    public ImgoingResponse<PlanDto> modify (
+            HttpServletRequest httpServletRequest,
+            @ApiParam(value = "일정 id", required = true, example = "1")
+            @PathVariable(value = "planId") Long planId,
+            @RequestBody @Valid PlanRequest planRequest,
+            User user
+    ) {
+        Plan oldPlan = (Plan)httpServletRequest.getAttribute("plan");
+        return new ImgoingResponse<>(planService.modify(user, oldPlan, planRequest));
+    }
 
-//    @ApiOperation(value = "일정 삭제")
-//    @DeleteMapping("/{planId}")
-//    @ApiResponse(code = 204, message = "일정 삭제 성공", response = String.class)
-//    public ImgoingResponse<String> delete(
-//            HttpServletRequest httpServletRequest,
-//            @ApiParam(value = "일정 id", required = true, example = "1")
-//            @PathVariable(value = "planId") Long planId
-//    ) {
-//        planService.delete((Plan)httpServletRequest.getAttribute("plan"));
-//        String responseMessage = "planId = " + planId + "일정이 삭제되었습니다.";
-//        return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
-//    }
+    @ApiOperation(value = "일정 삭제")
+    @DeleteMapping("/{planId}")
+    @ApiResponse(code = 204, message = "일정 삭제 성공", response = String.class)
+    public ImgoingResponse<String> delete(
+            HttpServletRequest httpServletRequest,
+            @ApiParam(value = "일정 id", required = true, example = "1")
+            @PathVariable(value = "planId") Long planId
+    ) {
+        planService.delete((Plan)httpServletRequest.getAttribute("plan"));
+        String responseMessage = "planId = " + planId + "일정이 삭제되었습니다.";
+        return new ImgoingResponse<>(HttpStatus.NO_CONTENT, responseMessage);
+    }
 
     @ApiOperation(value = "가장 최근 약속까지 남은 시간")
     @GetMapping("/remaining/time")
