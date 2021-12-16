@@ -5,14 +5,20 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitConfig {
-    private static final String EXCHANGE_NAME = "sample.exchange";
-    private static final String QUEUE_NAME = "sample.queue";
-    private static final String ROUTING_KEY = "sample.#";
+    @Value("${rabbit.exchange}")
+    private String EXCHANGE_NAME;
+
+    @Value("${rabbit.queue}")
+    private String QUEUE_NAME;
+
+    @Value("${rabbit.routing}")
+    private String ROUTING_KEY;
 
     @Bean
     TopicExchange exchange() {
@@ -32,21 +38,12 @@ public class RabbitConfig {
     @Bean
     RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
+        rabbitTemplate.setMessageConverter(messageConverter);
         return rabbitTemplate;
     }
 
-//    public static final String topicExchangeName = "foo";
-
-//    public AmqpTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-//        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-//        rabbitTemplate.setMessageConverter(jsonMessageConverter());
-//        return rabbitTemplate;
-//    }
-
-//    // java object type을 message로 보내기 위한 message converter
-//    @Bean
-//    MessageConverter jsonMessageConverter() {
-//        return new Jackson2JsonMessageConverter();
-//    }
+    @Bean
+    MessageConverter messageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
 }

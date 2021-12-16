@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imgoing.api.domain.entity.Plan;
 import org.imgoing.api.repository.PlanRepository;
-import org.imgoing.batch.publish.PublishMessage;
+import org.imgoing.batch.publish.CustomMessage;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.batch.core.ExitStatus;
@@ -13,13 +13,13 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Configuration
@@ -27,10 +27,15 @@ import java.util.stream.Collectors;
 public class PushNotificationJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
+
     private final RabbitTemplate rabbitTemplate;
     private final PlanRepository planRepository;
 
-    private static final String EXCHANGE_NAME = "sample.exchange";
+    @Value("${rabbit.exchange}")
+    private String EXCHANGE_NAME;
+
+    @Value("${rabbit.routing}")
+    private String ROUTING_KEY;
 
     @Bean
     public Job job() {
@@ -75,18 +80,20 @@ public class PushNotificationJobConfig {
                     log.info("3. publishMessageList size = {}", publishMessageList.size());
                     */
 
-                    List<PublishMessage> publishMessageList = new ArrayList<>();
-                    PublishMessage pm = PublishMessage.builder()
+                    List<CustomMessage> customMessageList = new ArrayList<>();
+                    CustomMessage customMessage = CustomMessage.builder()
                             .userId(Long.parseLong("1"))
                             .planId(Long.parseLong("1"))
                             .message("test message")
                             .build();
-                    publishMessageList.add(pm);
-                    log.info("3. test publishMessageList size = {}", publishMessageList.size());
+                    customMessageList.add(customMessage);
+                    log.info("3. test customMessageList size = {}", customMessageList.size());
 
                     // 4. message publish 하기
                     try {
-                        rabbitTemplate.convertAndSend(EXCHANGE_NAME, "sample.#", "sample message");
+                        for(CustomMessage message : customMessageList) {
+                            rabbitTemplate.convertAndSend(EXCHANGE_NAME, ROUTING_KEY, message);
+                        }
                         log.info("4. publish 성공");
                     } catch (AmqpException e) {
                         log.info("publish error -> {}", e);
