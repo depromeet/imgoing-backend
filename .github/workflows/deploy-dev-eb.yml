@@ -3,6 +3,12 @@ name: Deploy to Test EB
 on:
   push:
     branches: [ develop ]
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Person to greet"
+        required: true
+        default: "bluayer"
 
 jobs:
   build:
