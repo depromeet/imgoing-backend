@@ -3,6 +3,12 @@ name: 'Deploy Developing Application to Instance'  # 깃허브 레포지토리 a
 on: # workflow 파일을 자동으로 트리거하는 이벤트를 명시한다.
   push: # push 이벤트를 명시하면, 누군가가 깃 레포지토리에 변경사항을 push 하는 시점마다 job이 실행된다.
     branches: [ develop ]
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Person to greet"
+        required: true
+        default: "bluayer"
 
 jobs:
   build:
