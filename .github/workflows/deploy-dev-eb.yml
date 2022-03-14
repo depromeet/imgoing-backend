@@ -3,12 +3,12 @@ name: 'Deploy Developing Application to Instance'  # 깃허브 레포지토리 a
 on: # workflow 파일을 자동으로 트리거하는 이벤트를 명시한다.
   push: # push 이벤트를 명시하면, 누군가가 깃 레포지토리에 변경사항을 push 하는 시점마다 job이 실행된다.
     branches: [ develop ]
-  workflow_dispatch:
-    inputs:
-      name:
-        description: "Person to greet"
-        required: true
-        default: "bluayer"
+#  workflow_dispatch:
+#    inputs:
+#      name:
+#        description: "Person to greet"
+#        required: true
+#        default: "bluayer"
 
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v2 # 해당 step에서 사용할 액션. Github 마켓플레이스에 올라온 action들을 사용할 수도 있다.{owner}/{repo}@{ref|version} 의 형태를 지닌다.
 
       - name: 'Set up JDK 11'
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v1.4.3
         with: # 해당 action에 의해 정의되는 input 파라미터. key/value 페어로 되어 있다.
           java-version: 11
 
@@ -50,15 +50,16 @@ jobs:
         with: # 해당 action에 의해 정의되는 input 파라미터. key/value 페어로 되어 있다.
           format: YYYY-MM-DDTHH-mm-ss
           utcOffset: "+09:00"
-        run: |
-          echo "::set-env name=CURRENT_TIME::$( \
-            ${{steps.current-time.outputs.formattedTime}} \
-          )"
+#        run: |
+#          echo "CURRENT_TIME=$( \
+#            ${{steps.current-time.outputs.formattedTime}} \
+#          )" >> $GITHUB_PATH
 
       - name: 'Copy JAR File to Deploy folder' # mkdir -p 옵션을 사용할 경우에는 존재하지 않는 중간의 디렉토리를 자동을 생성해 준다.
         run: |
           mkdir -p deploy
           cp ./Imgoing-api/build/libs/Imgoing-api.jar deploy/Imgoing-api-${{steps.current-time.outputs.formattedTime}}.jar
+          ls -al deploy
 
       - name: 'Write Config & Key Files' # Github-hosting instance에서 실행됨
         run: |
@@ -77,7 +78,7 @@ jobs:
           curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
           chmod +x install.sh
           ./install.sh --accept-all-defaults
-          echo "::add-path::/home/runner/bin"
+          echo "/home/runner/bin" >> $GITHUB_PATH
           exec -l $SHELL
 
       - name: 'Fix Config File Permissions'
@@ -88,24 +89,26 @@ jobs:
 
       - name: 'Check Existing Instance'
         run: |
-          echo "::set-env name=INSTANCE_OCID::$( \
+          echo "INSTANCE_OCID=$( \
             oci compute instance list \
             --lifecycle-state RUNNING \
             --compartment-id ${{secrets.VM_COMPARTMENT_OCID}} \
             --display-name arm-instance0 \
             --query "data [0].id" \
             --raw-output \
-          )"
+          )" >> $GITHUB_ENV
+          echo Instance IP: ${{ env.INSTANCE_OCID }}
 
 
       - name: 'Get Instance IP'
         run: |
-          echo "::set-env name=INSTANCE_IP::$( \
+          echo "INSTANCE_IP=$( \
             oci compute instance list-vnics \
             --instance-id ${{env.INSTANCE_OCID}} \
             --query 'data [0]."public-ip"' \
             --raw-output \
-          )"
+          )" >> $GITHUB_ENV
+          echo Instance IP: ${{ env.INSTANCE_IP }}
 
 
       - name: 'Wait for SSH'
@@ -122,6 +125,7 @@ jobs:
           host: ${{ env.INSTANCE_IP }}
           username: ubuntu
           key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
           script: |
             pid=`ps aux | grep "[I]mgoing-*.jar" | awk '{print $2}'`
             if [ "$pid" == "" ]; then
@@ -137,9 +141,10 @@ jobs:
           host: ${{ env.INSTANCE_IP }}
           username: ubuntu
           key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
-          source: "deploy/imgoing-api-${{steps.current-time.outputs.formattedTime}}.jar"
-          target: "app"
-          strip_components: 2
+          passphrase: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
+          source: "deploy/Imgoing-api-${{steps.current-time.outputs.formattedTime}}.jar"
+          target: "/home/ubuntu/app"
+          strip_components: 1
 
 
       - name: 'Start App'
@@ -148,6 +153,7 @@ jobs:
           host: ${{ env.INSTANCE_IP }}
           username: ubuntu
           key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PRIVATE_KEY_PASSPHRASE }}
           script: |
-            sudo mv ~/app/imgoing-api-${{steps.current-time.outputs.formattedTime}}.jar /app/imgoing-api.jar
-            nohup java -jar /app/imgoing-api.jar > output.$(date --iso).log 2>&1 &
+            sudo mv ~/app/Imgoing-*.jar /app/Imgoing-api.jar
+            nohup java -jar /app/Imgoing-api.jar > output.$(date --iso).log 2>&1 &
