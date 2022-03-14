@@ -1,62 +1,147 @@
-name: Deploy to Test EB
+name: 'Deploy Developing Application to Instance'  # 깃허브 레포지토리 action 탭에 노출되는 workflow의 이름. optional한 값이다.
 
-on:
-  push:
+on: # workflow 파일을 자동으로 트리거하는 이벤트를 명시한다.
+  push: # push 이벤트를 명시하면, 누군가가 깃 레포지토리에 변경사항을 push 하는 시점마다 job이 실행된다.
     branches: [ develop ]
 
 jobs:
   build:
-    name: CD Pipeline
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+    name: 'CI/CD Pipeline' # 테스트 추가 필요
+    runs-on: ubuntu-18.04 # 해당 job을 어떤 OS에서 실행할 것인지 명시한다.
+    steps: # job이 가질 수 있는 동작의 나열. 각각의 step은 독립적인 프로세스를 가진다.
+      - name: 'Checkout' # step의 이름
+        uses: actions/checkout@v2 # 해당 step에서 사용할 액션. Github 마켓플레이스에 올라온 action들을 사용할 수도 있다.{owner}/{repo}@{ref|version} 의 형태를 지닌다.
 
-      - name: Set up JDK 1.11
-        uses: actions/setup-java@v1.4.3
-        with:
-          java-version: 1.11
+      - name: 'Set up JDK 11'
+        uses: actions/setup-java@v2
+        with: # 해당 action에 의해 정의되는 input 파라미터. key/value 페어로 되어 있다.
+          java-version: 11
 
-      - name: Get application.yaml from s3
-        env:
+      - name: 'Check Java Version'
+        run: |
+          java --version
+
+      - name: 'Get application.yml from AWS S3'
+        env: # 해당 job에서 사용할 환경 변수를 key/value의 형태로 설정한다.
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
+        run: | # job에 할당된 컴퓨팅 자원의 shell을 이용하여 커맨드 라인을 실행한다.
           aws s3 cp \
             --region ap-northeast-2 \
             ${{ secrets.CONFIG_BUCKET }}/application-dev.yml Imgoing-api/src/main/resources/application.yml
 
-      - name: Grant execute permission for gradlew
+      - name: 'Grant execute permission for gradlew'
         run: chmod +x ./gradlew
         shell: bash
 
-      - name: Build with Gradle
+      - name: 'Build with Gradle'
         run: ./gradlew clean build
         shell: bash
 
-      - name: Get current time
+      - name: 'Get current time'
         uses: 1466587594/get-current-time@v2
         id: current-time
-        with:
+        with: # 해당 action에 의해 정의되는 input 파라미터. key/value 페어로 되어 있다.
           format: YYYY-MM-DDTHH-mm-ss
           utcOffset: "+09:00"
+        run: |
+          echo "::set-env name=CURRENT_TIME::$( \
+            ${{steps.current-time.outputs.formattedTime}} \
+          )"
 
-      - name: Generate deployment package
+      - name: 'Copy JAR File to Deploy folder' # mkdir -p 옵션을 사용할 경우에는 존재하지 않는 중간의 디렉토리를 자동을 생성해 준다.
         run: |
           mkdir -p deploy
-          cp ./Imgoing-api/build/libs/Imgoing-api.jar deploy/application.jar
-          cp Procfile deploy/Procfile
-          cp -r .ebextensions deploy/.ebextensions
-          cp -r .platform deploy/.platform
-          cd deploy && zip -r deploy.zip .
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v14
+          cp ./Imgoing-api/build/libs/Imgoing-api.jar deploy/Imgoing-api-${{steps.current-time.outputs.formattedTime}}.jar
+
+      - name: 'Write Config & Key Files' # Github-hosting instance에서 실행됨
+        run: |
+          mkdir ~/.oci
+          echo "[DEFAULT]" >> ~/.oci/config
+          echo "user=${{secrets.OCI_USER_OCID}}" >> ~/.oci/config
+          echo "fingerprint=${{secrets.OCI_FINGERPRINT}}" >> ~/.oci/config
+          echo "pass_phrase=${{secrets.OCI_PASSPHRASE}}" >> ~/.oci/config
+          echo "region=${{secrets.OCI_REGION}}" >> ~/.oci/config
+          echo "tenancy=${{secrets.OCI_TENANCY_OCID}}" >> ~/.oci/config
+          echo "key_file=~/.oci/key.pem" >> ~/.oci/config
+          echo "${{secrets.OCI_KEY_FILE}}" >> ~/.oci/key.pem
+
+      - name: 'Install OCI CLI'
+        run: |
+          curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh
+          chmod +x install.sh
+          ./install.sh --accept-all-defaults
+          echo "::add-path::/home/runner/bin"
+          exec -l $SHELL
+
+      - name: 'Fix Config File Permissions'
+        run: |
+          oci setup repair-file-permissions --file /home/runner/.oci/config
+          oci setup repair-file-permissions --file /home/runner/.oci/key.pem
+
+
+      - name: 'Check Existing Instance'
+        run: |
+          echo "::set-env name=INSTANCE_OCID::$( \
+            oci compute instance list \
+            --lifecycle-state RUNNING \
+            --compartment-id ${{secrets.VM_COMPARTMENT_OCID}} \
+            --display-name arm-instance0 \
+            --query "data [0].id" \
+            --raw-output \
+          )"
+
+
+      - name: 'Get Instance IP'
+        run: |
+          echo "::set-env name=INSTANCE_IP::$( \
+            oci compute instance list-vnics \
+            --instance-id ${{env.INSTANCE_OCID}} \
+            --query 'data [0]."public-ip"' \
+            --raw-output \
+          )"
+
+
+      - name: 'Wait for SSH'
+        run: |
+          while ! nc -w5 -z ${{ env.INSTANCE_IP }} 22; do
+                  sleep 5
+                  echo "SSH not available..."
+          done; echo "SSH ready!"
+
+
+      - name: 'Stop App'
+        uses: appleboy/ssh-action@master
         with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: imgoing-dev
-          environment_name: Imgoingdev-env
-          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
-          region: ap-northeast-2
-          deployment_package: deploy/deploy.zip
-          wait_for_environment_recovery: 180
+          host: ${{ env.INSTANCE_IP }}
+          username: ubuntu
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          script: |
+            pid=`ps aux | grep "[I]mgoing-*.jar" | awk '{print $2}'`
+            if [ "$pid" == "" ]; then
+              echo "Process not found"
+            else
+              kill -9 $pid
+            fi
+            sudo mkdir -p /app
+
+      - name: 'Push JAR'
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ env.INSTANCE_IP }}
+          username: ubuntu
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          source: "deploy/imgoing-api-${{steps.current-time.outputs.formattedTime}}.jar"
+          target: "app"
+          strip_components: 2
+
+
+      - name: 'Start App'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.INSTANCE_IP }}
+          username: ubuntu
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          script: |
+            sudo mv ~/app/imgoing-api-${{steps.current-time.outputs.formattedTime}}.jar /app/imgoing-api.jar
+            nohup java -jar /app/imgoing-api.jar > output.$(date --iso).log 2>&1 &

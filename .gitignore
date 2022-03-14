@@ -1,5 +1,6 @@
 .DS_Store
 src/main/resources/application.yml
+application-*.yml
 
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,gradle,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij,gradle,java
@@ -160,6 +161,7 @@ gradle-app.setting
 # Eclipse Core
 .project
 # JDT-specific (Eclipse Java Development Tools)
+.classpath
 .classpath
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,gradle,java
