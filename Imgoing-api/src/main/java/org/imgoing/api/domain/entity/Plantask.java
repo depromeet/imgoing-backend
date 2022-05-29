@@ -26,8 +26,11 @@ public class Plantask extends BaseTime {
     @JoinColumn(name = "taskId", referencedColumnName = "id")
     private Task task;
 
-    public void setPlanTask(Plan plan, Task task) {
-        this.plan = plan;
-        this.task = task;
+    @Column(nullable = false)
+    private Integer sequence;
+
+    public void modifySequence(Integer sequence) {
+        this.sequence = sequence;
     }
+
 }

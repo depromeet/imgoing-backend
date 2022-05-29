@@ -24,5 +24,5 @@ public interface PlanMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", source = "user")
-    Plan toEntity(User user, PlanRequest.Create dto);
+    Plan toEntity(User user, PlanRequest dto);
 }

@@ -2,12 +2,16 @@ package org.imgoing.api.service;
 
 import lombok.RequiredArgsConstructor;
 import org.imgoing.api.domain.entity.Task;
+import org.imgoing.api.domain.entity.User;
+import org.imgoing.api.dto.task.TaskDto;
+import org.imgoing.api.mapper.TaskMapper;
 import org.imgoing.api.repository.TaskRepository;
 import org.imgoing.api.support.ImgoingError;
 import org.imgoing.api.support.ImgoingException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,10 +19,30 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
     @Transactional
     public Task create(Task newTask){
         return taskRepository.save(newTask);
+    }
+
+    @Transactional
+    public List<Task> createAll(User user, List<TaskDto> taskDtoList) {
+        List<Task> newTaskList = new ArrayList<>();
+        for (int i = 0; i < taskDtoList.size(); i++) {
+            Task newTask = taskMapper.toEntity(taskDtoList.get(i));
+            if(!newTask.getIsBookmarked() && newTask.getId() == null){
+                newTask = Task.builder()
+                        .name(newTask.getName())
+                        .time(newTask.getTime())
+                        .isBookmarked(newTask.getIsBookmarked())
+                        .user(user)
+                        .build();
+                taskRepository.save(newTask);
+            }
+            newTaskList.add(newTask);
+        }
+        return newTaskList;
     }
 
     @Transactional(readOnly = true)
@@ -63,5 +87,10 @@ public class TaskService {
     @Transactional
     public void deleteAll(List<Task> tasks) {
         taskRepository.deleteAll(tasks);
+    }
+
+    @Transactional
+    public void deleteAllByIdIn(List<Long> taskIdList) {
+        taskRepository.deleteAllByIdIn(taskIdList);
     }
 }

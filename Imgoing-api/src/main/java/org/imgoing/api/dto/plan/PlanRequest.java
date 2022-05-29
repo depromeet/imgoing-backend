@@ -3,11 +3,7 @@ package org.imgoing.api.dto.plan;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import org.imgoing.api.dto.task.TaskDto;
 
@@ -16,9 +12,10 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@SuperBuilder
+@Builder
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 @ApiModel(value = "악속 정보", description = "약속 모델")
 public class PlanRequest {
     @ApiModelProperty(value = "일정 id")
@@ -66,15 +63,4 @@ public class PlanRequest {
 
     @ApiModelProperty(value = "준비항목")
     private List<TaskDto> task;
-
-    @SuperBuilder
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @ApiModel(value = "플랜 생성 모델")
-    public static class Create extends PlanRequest {
-        @ApiModelProperty(value = "북마크 리스트")
-        private List<Long> bookmarkedTaskIds;
-    }
 }

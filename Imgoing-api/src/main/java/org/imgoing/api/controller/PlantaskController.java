@@ -101,7 +101,7 @@ public class PlantaskController {
             @RequestParam("days") Integer days
     ) {
         List<PlantaskRead> planTaskHistory = this.planService.getPlanHistoryDaysAgo(user, days).stream()
-                .flatMap(plan -> plan.getPlantasks().stream().map(plantask -> new PlantaskRead(plantask, taskMapper)))
+                .flatMap(plan -> plantaskService.getByPlanIdOrderBySequenceAsc(plan.getId()).stream().map(plantask -> new PlantaskRead(plantask, taskMapper)))
                 .collect(Collectors.toList());
         return new ImgoingResponse<>(planTaskHistory, HttpStatus.OK);
     }
